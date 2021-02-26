@@ -64,31 +64,29 @@ $ npm start
 
 # Firebase setup
 
-
 ## Set up Firebase Account
 
-1. In order to start with Firebase, please visit the [Firebase Console](console.firebase.google.com) and create a Firebase account. 
+1. In order to start with Firebase, please visit the [Firebase Console](console.firebase.google.com) and create a Firebase account.
 2. Once your Firebase account is created, revisit the console and create a new project by clicking the “Add project” button
 
-![alt_text](images/image1.png "image_tooltip")
+![alt_text](images/image1.png 'image_tooltip')
 
 3. Create a unique name for your project. Below the name input box will be the project ID, write it down.
 
-
-![alt_text](images/image2.png "image_tooltip")
+![alt_text](images/image2.png 'image_tooltip')
 
 4. The next page is regarding activating Google Analytics for your Firebase project. Turn this option off as this is just a test application and we don’t need analytics activated.
 5. Firebase will then set up all the required resources for your project. When it’s done, you will see a “Your new project is ready” message with a continue option. Go ahead and click “Continue”.
 
 ## Firebase Authentication
 
-The sample requires users to be signed-in with an account before they can purchase and consume in-app purchases. User accounts also allow a user to access their purchases across multiple devices (purchases made via the Play Store on Chrome OS, can still be accessed on an Android device). 
+The sample requires users to be signed-in with an account before they can purchase and consume in-app purchases. User accounts also allow a user to access their purchases across multiple devices (purchases made via the Play Store on Chrome OS, can still be accessed on an Android device).
 
 1. To set up authentication, go to your project page in the [Firebase Console](https://console.firebase.google.com)
 2. In the left-hand menu, click to expand the “Build” section and choose “Authentication”.
 3. From there, click on the Sign-in method tab (If you see a “Get Started” button, clicking on it will take you to the same page as well).
 
-![alt_text](images/image3.png "image_tooltip")
+![alt_text](images/image3.png 'image_tooltip')
 
 4. Click on the Google provider in the Sign-in providers list.
 5. Turn the switch on to enable the Google Provider.
@@ -96,7 +94,7 @@ The sample requires users to be signed-in with an account before they can purcha
 7. Choose an email address for the project support email.
 8. Click Save to confirm changes.
 
-![alt_text](images/image4.png "image_tooltip")
+![alt_text](images/image4.png 'image_tooltip')
 
 The sample code loads the authentication method without needing to pass in the Web SDK configuration information because Firebase Hosted Configuration handles this automatically. To learn more about authentication, please visit the Firebase [documentation here](https://firebase.google.com/docs/auth).
 
@@ -104,38 +102,38 @@ The sample code loads the authentication method without needing to pass in the W
 
 1. In the left hand navigation menu for your project in the [Firebase console](https://console.firebase.google.com), click on the “Hosting” option. At the top of the page should be a Get Started link, click on it.
 
-![alt_text](images/image5.png "image_tooltip")
+![alt_text](images/image5.png 'image_tooltip')
 
 2. The Get Started button will provide the command to install the [Firebase CLI](https://github.com/firebase/firebase-tools). That command is:
 
-    ```
-    $ npm install -g firebase-tools
-    ```
+   ```
+   $ npm install -g firebase-tools
+   ```
 
 3. After installing the Firebase CLI, you will need to login to Firebase. You can use the following command:
 
-    ```
-    $ firebase login
-    ```
+   ```
+   $ firebase login
+   ```
 
-4. Finally, in the downloaded project, in the [.firebaserc](https://github.com/chromeos/pwa-play-billing/blob/main/.firebaserc#L3) file and the [firebase.json](https://github.com/chromeos/pwa-play-billing/blob/main/firebase.json#L3) file, replace `<FIREBASE_PROJECT_ID>` with your project ID you noted down earlier when you first created the Firebase project. 
+4. Finally, in the downloaded project, in the [.firebaserc](https://github.com/chromeos/pwa-play-billing/blob/main/.firebaserc#L3) file and the [firebase.json](https://github.com/chromeos/pwa-play-billing/blob/main/firebase.json#L3) file, replace `<FIREBASE_PROJECT_ID>` with your project ID you noted down earlier when you first created the Firebase project.
 
-    ```
-    // firebase.json
-    {
-    "hosting": {
-        "site": "<FIREBASE_PROJECT_ID>",
-        "public": "src",
-    ...
-    ```
+   ```
+   // firebase.json
+   {
+   "hosting": {
+       "site": "<FIREBASE_PROJECT_ID>",
+       "public": "src",
+   ...
+   ```
 
-    ```
-    // .firebaserc
-    {
-    "projects": {
-        "default": "<FIREBASE_PROJECT_ID>"
-    }
-    ```
+   ```
+   // .firebaserc
+   {
+   "projects": {
+       "default": "<FIREBASE_PROJECT_ID>"
+   }
+   ```
 
 [The frontend code can be found here.](https://github.com/chromeos/pwa-play-billing/tree/main/src)
 
@@ -149,25 +147,25 @@ A large portion of granting purchase entitlements is controlled from the backend
 2. Click on “Upgrade project”
 3. Confirm that the selected plan is Blaze.
 
-    **Note:** If you don’t have a billing account yet, Firebase will take you to the flow to create a billing account. Complete the steps to create a billing account, and go back to Step 1.
+   **Note:** If you don’t have a billing account yet, Firebase will take you to the flow to create a billing account. Complete the steps to create a billing account, and go back to Step 1.
 
-![alt_text](images/image6.png "image_tooltip")
+![alt_text](images/image6.png 'image_tooltip')
 
 4. Click Purchase to switch to the Blaze billing plan.
 
-![alt_text](images/image7.png "image_tooltip")
+![alt_text](images/image7.png 'image_tooltip')
 
 5. You can also set a budget alert to avoid unexpected bills in the confirmation page.
 
-![alt_text](images/image8.png "image_tooltip")
+![alt_text](images/image8.png 'image_tooltip')
 
 ## Firebase Cloud Firestore
 
-This sample uses [Firebase Cloud Firestore](https://firebase.google.com/docs/firestore) to store user information. 
+This sample uses [Firebase Cloud Firestore](https://firebase.google.com/docs/firestore) to store user information.
 
 1. To set up Firestore, visit the Firestore tab in the Firebase Console and click Create Database.
 
-![alt_text](images/image9.png "image_tooltip")
+![alt_text](images/image9.png 'image_tooltip')
 
 2. In the first step, choose “production mode” to keep the data private and click Next. The Admin SDK in the sample functions code handles the communications with the database.
 3. In the second step, choose a Cloud Firestore location. Pick something close to your location where your functions are deployed. Then click Enable.
@@ -346,13 +344,11 @@ To list your TWA in the Google Play Store, you’ll need to [create a developer 
 
 After your developer account is set up, go to “All apps” in the left navigation menu and select “Create app”. Once you fill out the required fields to create your app, you’ll be brought to the “Dashboard” where you’ll find step-by-step task guides to test, setup, and release your app. For more information on creating a new app, visit [Play Console help page](https://support.google.com/googleplay/android-developer/answer/9859152?hl=en).
 
-
 ## Package your PWA with Bubblewrap
 
 [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap/tree/master/packages/cli) is a command-line tool that will wrap your PWA in a Trusted Web Activity and output AAB and APK files that can be uploaded to the Play Console. To use Bubblewrap you need Node.js 10.0 or above.
 
 During your first time running Bubblewrap, it will give you the option to download and install the dependencies, or you may [set them up manually](https://github.com/GoogleChromeLabs/bubblewrap/tree/master/packages/cli#manually-setting-up-the-environment) yourself. We recommend checking out the [quickstart guide](https://github.com/GoogleChromeLabs/bubblewrap/tree/master/packages/cli#quickstart-guide) for more details.
-
 
 ### Install Bubblewrap
 
@@ -370,7 +366,7 @@ $ bubblewrap init --manifest https://<project.id>.web.app/manifest.json
 
 This init command will parse the manifest and prompt you to enter or confirm values for your Android project. Fill out the “Application name” and “Short name” as you would like your app name to appear (note that you are restricted to 12 characters for “short name”).
 
-![alt_text](images/image10.png "image_tooltip")
+![alt_text](images/image10.png 'image_tooltip')
 
 If you have an existing listing in the Play Store:
 
@@ -386,7 +382,7 @@ If you’re planning to create a new listing:
 
 When the prompt asks you whether to enable Play Billing, respond “Yes”.
 
-![alt_text](images/image11.png "image_tooltip")
+![alt_text](images/image11.png 'image_tooltip')
 
 ### Build
 
@@ -394,12 +390,12 @@ When the prompt asks you whether to enable Play Billing, respond “Yes”.
 $ bubblewrap build
 ```
 
-After successfully building your project, in your project directory, you’ll see the APK (``app-release-signed.apk``) and AAB (``app-release-bundle.aab``) you can upload to your Play Console (next section).
+After successfully building your project, in your project directory, you’ll see the APK (`app-release-signed.apk`) and AAB (`app-release-bundle.aab`) you can upload to your Play Console (next section).
 
 Note that if you skipped the step for updating your Digital Asset Links above, you may receive a warning message which is safe to ignore for now.
 
 > Read more about setting up Digital Asset Links at:
->	https://developers.google.com/web/android/trusted-web-activity/quick-start#creating-your-asset-link-file
+> https://developers.google.com/web/android/trusted-web-activity/quick-start#creating-your-asset-link-file
 >
 > Failed to run the PWA Quality Criteria checks. Skipping.
 
@@ -409,13 +405,13 @@ Note that if you skipped the step for updating your Digital Asset Links above, y
 
 Follow the tasks in the “Set up your app” section in the dashboard before moving on.
 
-![alt_text](images/image12.png "image_tooltip")
+![alt_text](images/image12.png 'image_tooltip')
 
 ### Upload your package
 
 1. We recommend you to publish to Internal Testing Track to speed up the time to start testing in the Play Store. You can access the Internal Testing Track by choosing on Internal testing on the left hand side menu.
 
-![alt_text](images/image13.png "image_tooltip")
+![alt_text](images/image13.png 'image_tooltip')
 
 2. Click on the “Create new release” button.
 3. If you haven’t uploaded a package before, Play Console will offer you to opt in for Play App Signing. This is highly recommended. Click Continue to opt in.
@@ -430,17 +426,17 @@ Follow the tasks in the “Set up your app” section in the dashboard before mo
 
 1. Click on Testers tab under Internal testing page
 
-![alt_text](images/image14.png "image_tooltip")
+![alt_text](images/image14.png 'image_tooltip')
 
 2. Either click on “Create email list” to create a new testers list. Add email addresses of your testers into this list and save. You can also edit an existing list by clicking on the right arrow button.
 3. Enable your testers list by clicking on the checkbox next to it.
 4. Save changes.
 
-![alt_text](images/image15.png "image_tooltip")
+![alt_text](images/image15.png 'image_tooltip')
 
 5. Click on the Copy link button under the “How testers join your test” to retrieve the URL to your testing track. Share this link with your testers. Testers need to follow this link and opt-in for receiving the testing version first to install your app.
 
-![alt_text](images/image16.png "image_tooltip")
+![alt_text](images/image16.png 'image_tooltip')
 
 ## Run the app
 
@@ -464,9 +460,9 @@ If you see “Missing requirements for accessing this page”, follow the instru
 
 Repeat this process for these Product IDs:
 
-*   `coins_200`
-*   `coins_1000`
-*   `onetime`
+- `coins_200`
+- `coins_1000`
+- `onetime`
 
 ### Subscriptions
 
@@ -481,11 +477,9 @@ Repeat this process for these Product IDs:
 
 If you’d like to add your own SKUs, be sure to note down the “Product ID”s as that’s how they’ll be identified by the Digital Goods API. In the case of our sample code, we obtain the product IDs from the SKUs collection we populated in Firestore (see above). So make sure the SKUs you’ve added in the Play Console matches the information in the SKUs collection in Firestore (and vice versa). If not, please adjust either accordingly so they are aligned.
 
-
 # Second Deploy
 
 Now that you’ve successfully created your TWA and uploaded it to the Play Console, it’s time to update the missing information and redeploy your PWA again.
-
 
 ## Update “View In Play Store” link
 
@@ -524,7 +518,6 @@ In order to publish your app to the Google Play Store and have your app be conne
 
 Update the [./src/.well-known/assetlinks.json file](https://github.com/chromeos/twa-sample/blob/main/src/.well-known/assetlinks.json) by replacing `<PLAY_PACKAGE_NAME>` with your app’s package name and `<SIGNING_KEY_CERT>` with your signing key’s SHA-256 fingerprint. You can find the SHA-256 certificate fingerprint in “App Integrity” under the “Setup” section in the left hand menu of the Play Console or use this [link](https://play.google.com/console/developers/app/keymanagement) and choose your developer account and then your app to be redirected.
 
-
 ```
 // assetlinks.json
 [
@@ -539,7 +532,6 @@ Update the [./src/.well-known/assetlinks.json file](https://github.com/chromeos/
 ]
 ```
 
-
 For information on Digital Asset Links, please check out the following YouTube video:  
 [Validating your Trusted Web Activity’s Digital Asset Links](https://youtu.be/3bAQPnxLd4c).
 
@@ -553,83 +545,80 @@ $ npm run deploy
 
 Double-check the manifest and asset links at `https://<project.id>.web.app/manifest.json` and `https://<project.id>.web.app/.well-known/assetlinks.json` to make sure they’ve updated.
 
-
 # Google Play Developer API
 
 Like in our sample, it is highly recommended that you verify purchases and tokens in your backend server with the [Google Play Developer API](https://developers.google.com/android-publisher), alongside using the Digital Goods API in your PWA. There are two main configuration steps before you can use the API in your backend code.
-
 
 ## Link API Project to your Play Console
 
 To [link your Google Cloud project in the Play Console](https://developers.google.com/android-publisher/getting_started#using_an_existing_api_project), go to the “API access” section in the left-hand navigation general user menu (not the app menu). This is under “Settings” > “Developer account” > “API access”.
 
-![alt_text](images/image17.png "image_tooltip")
+![alt_text](images/image17.png 'image_tooltip')
 
-You can either “Link an existing project” or “Create a new project”. If you don’t see your existing project in the drop-down menu, first verify that the email you’ve used for your developer Play Console account is listed as an “Owner” in the [API Console](https://console.developers.google.com/iam-admin/) and that it has the Google Play Android Developer API enabled in the [API Library](https://console.developers.google.com/apis/library) (it may take up to a couple hours after you’ve done these for your project to be listed in the Play Console). 
+You can either “Link an existing project” or “Create a new project”. If you don’t see your existing project in the drop-down menu, first verify that the email you’ve used for your developer Play Console account is listed as an “Owner” in the [API Console](https://console.developers.google.com/iam-admin/) and that it has the Google Play Android Developer API enabled in the [API Library](https://console.developers.google.com/apis/library) (it may take up to a couple hours after you’ve done these for your project to be listed in the Play Console).
 
-If you create a new project, the API will automatically be enabled and linked for you. You can always unlink and link a new Google Cloud project at any time. 
-
+If you create a new project, the API will automatically be enabled and linked for you. You can always unlink and link a new Google Cloud project at any time.
 
 ## Setup a service account
 
 Backend services authenticate through a service account to access Google Play Developer API. To [set up a service account as your API access client](https://developers.google.com/android-publisher/getting_started#using_a_service_account), scroll down to the “Service accounts” section on the same “API access” page.
 
-If you had linked an existing API project with existing service accounts, you may see your available service accounts listed (you may need to click “Refresh service accounts”). If you don’t see your expected service accounts, check the service account permissions in the [Google Cloud Platform](https://console.cloud.google.com/iam-admin/iam) (make sure you are in the right project). Your service account should have a suitable role; for our purposes “Service Account User” is sufficient. Then go back to the Play Console and refresh service accounts to see it listed. 
+If you had linked an existing API project with existing service accounts, you may see your available service accounts listed (you may need to click “Refresh service accounts”). If you don’t see your expected service accounts, check the service account permissions in the [Google Cloud Platform](https://console.cloud.google.com/iam-admin/iam) (make sure you are in the right project). Your service account should have a suitable role; for our purposes “Service Account User” is sufficient. Then go back to the Play Console and refresh service accounts to see it listed.
 
 If you don’t have a service account, follow these instructions to create a new service account.
 
 1. Click “Create new service account”
 
-![alt_text](images/image18.png "image_tooltip")
+![alt_text](images/image18.png 'image_tooltip')
 
 2. Follow the instructions and go to the [Google Cloud Platform](https://console.developers.google.com/iam-admin/serviceaccounts/project?project=498462053203) and click “+CREATE SERVICE ACCOUNT”.
 3. Fill in the details and click “Create”.
 4. Then complete step “2. Grant this service account access to project”. Though it is labeled optional, it isn’t in our case. We recommend adding the “Service Accounts” > “Service Account User” role.
 
-![alt_text](images/image19.png "image_tooltip")
+![alt_text](images/image19.png 'image_tooltip')
 
 5. Step 3 is optional as labeled. Click Done to save your service account.
 6. Now go back to the Play Console, and click “Refresh service accounts” to see your new service account listed. Then click “Grant access” to give it permissions.
 
-![alt_text](images/image20.png "image_tooltip")
+![alt_text](images/image20.png 'image_tooltip')
 
 7. Make sure “Manage orders and subscriptions permission” is checked.
 
-![alt_text](images/image21.png "image_tooltip")
+![alt_text](images/image21.png 'image_tooltip')
 
 8. Click “Invite user”.
 
-![alt_text](images/image22.png "image_tooltip")
+![alt_text](images/image22.png 'image_tooltip')
 
 ## Create service account key
 
-Go back to the [Google Cloud Platform](https://console.developers.google.com/iam-admin/serviceaccounts/project?project=498462053203). You may see that for the service account we just created/used, it says “No keys” under “Key ID”. 
+Go back to the [Google Cloud Platform](https://console.developers.google.com/iam-admin/serviceaccounts/project?project=498462053203). You may see that for the service account we just created/used, it says “No keys” under “Key ID”.
 
-![alt_text](images/image23.png "image_tooltip")
+![alt_text](images/image23.png 'image_tooltip')
 
 To create a new key:
 
 1. Under the “Actions” three-dot menu, select “Manage keys”.
 2. In the window opened, click on “Add key” and choose “Create new key”.
 3. Choose your preferred format and click “Create”.
-4. It will then download a file that contains your private key. Store it somewhere safe and secure and **don’t lose it**! If you misplace it, you won’t be able to recover it but you can create another new key. 
+4. It will then download a file that contains your private key. Store it somewhere safe and secure and **don’t lose it**! If you misplace it, you won’t be able to recover it but you can create another new key.
 5. Use your private key to fill out the missing service account credentials in the [functions/src/config.ts](https://github.com/chromeos/pwa-play-billing/blob/main/functions/src/config.ts#L22-L26) file.
+
    1. Fill in the `serviceAccountEmail` const with the `client_email` from the private key file you downloaded.
    2. Copy the entire private key string (`private_key`) as is into the `serviceAccountPrivateKey` const.
 
-        ```
-        // config.ts
-        ...
-        // service account credentials
-        export const serviceAccountEmail = ＇＇;
-        export const serviceAccountPrivateKey = ＇＇;
-        ...
-        ```
+      ```
+      // config.ts
+      ...
+      // service account credentials
+      export const serviceAccountEmail = ＇＇;
+      export const serviceAccountPrivateKey = ＇＇;
+      ...
+      ```
 
 # Real-Time Developer Notifications (RTDN)
 
 [RTDN](https://developer.android.com/google/play/billing/getting-ready#configure-rtdn), which utilizes [Google Pub/Sub](https://cloud.google.com/pubsub/docs/overview), lets your backend server receive notifications from Google Play about any user’s entitlement changes. Specifically, RTDN is useful for subscriptions and essential if you have a cross-platform app.
-
 
 ## Google Cloud Console setup
 
@@ -637,25 +626,25 @@ To set up RTDN, first sign in to the [Google API Console](https://console.develo
 
 Navigate to “APIs & Services” in the left hand menu. Then click “+ ENABLE APIS AND SERVICES”, search for “Cloud Pub/Sub API” and enable it.
 
-![alt_text](images/image24.png "image_tooltip")
+![alt_text](images/image24.png 'image_tooltip')
 
 Then to create your Pub/Sub topic, go to the [Pub/Sub topics page](https://console.cloud.google.com/cloudpubsub/topicList) in the Cloud Console and click “+ CREATE TOPIC”.
 
 Fill in the “Topic ID” and note down the full topic name for later.
 
-![alt_text](images/image25.png "image_tooltip")
+![alt_text](images/image25.png 'image_tooltip')
 
 Then click on “ADD MEMBER” to add [google-play-developer-notifications@system.gserviceaccount.com](mailto:google-play-developer-notifications@system.gserviceaccount.com) with the “Pub/Sub Publisher” role which allows it to publish messages to the topic you’ve created.
 
-![alt_text](images/image26.png "image_tooltip")
+![alt_text](images/image26.png 'image_tooltip')
 
-![alt_text](images/image27.png "image_tooltip")
+![alt_text](images/image27.png 'image_tooltip')
 
 ## Play Console setup
 
 Now that you’ve created a topic and added the Google Play developer notifications account, you’ll need to set up RTDN in your app in the Play Console. In the left-hand navigation menu, scroll down to the “Monetize” section and select “Monetization setup”. Add your topic name which we noted down earlier from the Pub/Sub console. Click “Save changes”.
 
-![alt_text](images/image28.png "image_tooltip")
+![alt_text](images/image28.png 'image_tooltip')
 
 ## Backend setup
 
@@ -683,7 +672,7 @@ export const topicID = ＇<RTDN_TOPIC_ID>＇;
 ...
 ```
 
-If you have your own secure backend server, you should implement consuming the messages sent to your RTDN topic there, by using the [Pub/Sub client libraries](https://cloud.google.com/pubsub/docs/reference/libraries). For full Pub/Sub documentation, check out https://cloud.google.com/pubsub/docs/. 
+If you have your own secure backend server, you should implement consuming the messages sent to your RTDN topic there, by using the [Pub/Sub client libraries](https://cloud.google.com/pubsub/docs/reference/libraries). For full Pub/Sub documentation, check out https://cloud.google.com/pubsub/docs/.
 
 # Final deploy
 
@@ -707,9 +696,9 @@ The Digital Goods API will be available on Chrome OS stable starting with versio
 
 1. Enable the Chrome OS dev channel
 2. Enable the following flags in Chrome by navigating to chrome://flags and searching for the flag by name.
-    1. `#enable-experimental-web-platform-features`
-    2. `#enable-web-payments-experimental-features`
-    3. `#enable-debug-for-store-billing`
+   1. `#enable-experimental-web-platform-features`
+   2. `#enable-web-payments-experimental-features`
+   3. `#enable-debug-for-store-billing`
 3. Install your app from the Play Store on the device.
 
 ## Set up License Testers
@@ -722,6 +711,6 @@ To add license testing accounts:
 2. Fill in the “Add license testers” field.
 3. Click “Save changes”
 
-![alt_text](images/image29.png "image_tooltip")
+![alt_text](images/image29.png 'image_tooltip')
 
 See [Test your Google Play Billing Library integration](https://developer.android.com/google/play/billing/test) article for more information on License Testers and various test cases for different in-app products.
