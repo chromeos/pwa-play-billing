@@ -1,0 +1,41 @@
+{
+  "ignore": [
+    "license-header",
+    "*.md",
+    "*.json",
+    ".gitignore",
+    ".eslintignore",
+    ".firebaserc",
+    ".prettierignore",
+    ".prettierrc",
+    "*.log",
+    "CODEOWNERS",
+    "*/.gitignore",
+    "build",
+    "*.js.map",
+    "functions/lib/*",
+    "functions/node_modules/*",
+    "*/*.cache",
+    "README.md"
+  ],
+  "license": "license-header",
+  "licenseFormats": {
+    "js|ts|css": {
+      "prepend": "/*",
+      "append": " */\n",
+      "eachLine": {
+        "prepend": " * "
+      }
+    },
+    "html": {
+      "prepend": "<!DOCTYPE html>\n<!--",
+      "append": "-->\n"
+    },
+    "yml": {
+      "eachLine": {
+        "prepend": "# "
+      }
+    }
+  },
+  "trailingWhitespace": "TRIM"
+}

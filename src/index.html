@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2021 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<head>
+  <meta charset="utf-8" />
+  <title>Web Play Billing Sample Application</title>
+
+  <!-- Origin Trial -->
+  <meta http-equiv="origin-trial" content="$ORIGIN_TRIAL_TOKEN" />
+
+  <!-- Make the website responsive via a viewport tag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script>
+    // Check that service workers are supported
+    if ('serviceWorker' in navigator) {
+      // Use the window load event to keep the page load performant
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js');
+      });
+    }
+  </script>
+
+  <!-- The Material Web Components use standard JavaScript modules. -->
+  <script type="module" src="/js/index.js"></script>
+
+  <link rel="manifest" href="/manifest.json" />
+
+  <link href="/css/main.css" rel="stylesheet" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css?family=Material+Icons&display=block"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <app-bar id="app-bar" title="Web Play Billing Sample App"></app-bar>
+  <div id="content-container">
+    <coin-dialog id="coin-dialog">
+      <theme-picker slot="theme" id="theme-picker"></theme-picker>
+    </coin-dialog>
+    <h1>Welcome to Web Play Billing Sample App</h1>
+    <p>This is a sample application using Google Play Billing in a TWA.</p>
+    <div>
+      <h1>Available items to purchase:</h1>
+      <sku-list id="items-to-buy"></sku-list>
+    </div>
+  </div>
+  <p class="debug" id="debug-btn">Debug Logs</p>
+  <mwc-dialog heading="Debug Logs" id="debug-box">
+    <pre id="log-box"></pre>
+  </mwc-dialog>
+  <mwc-snackbar id="notification" labelText="Hello, I am a notification"> </mwc-snackbar>
+</body>
