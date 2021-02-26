@@ -68,11 +68,11 @@ $ npm start
 1. In order to start with Firebase, please visit the [Firebase Console](console.firebase.google.com) and create a Firebase account.
 2. Once your Firebase account is created, revisit the console and create a new project by clicking the “Add project” button
 
-![alt_text](images/image1.png 'image_tooltip')
+![Add Firebase project.](images/image1.png 'image_tooltip')
 
 3. Create a unique name for your project. Below the name input box will be the project ID, write it down.
 
-![alt_text](images/image2.png 'image_tooltip')
+![Create Firebase project name. Below, the full project ID is outlined.](images/image2.png 'image_tooltip')
 
 4. The next page is regarding activating Google Analytics for your Firebase project. Turn this option off as this is just a test application and we don’t need analytics activated.
 5. Firebase will then set up all the required resources for your project. When it’s done, you will see a “Your new project is ready” message with a continue option. Go ahead and click “Continue”.
@@ -85,7 +85,7 @@ The sample requires users to be signed-in with an account before they can purcha
 2. In the left-hand menu, click to expand the “Build” section and choose “Authentication”.
 3. From there, click on the Sign-in method tab (If you see a “Get Started” button, clicking on it will take you to the same page as well).
 
-![alt_text](images/image3.png 'image_tooltip')
+![Add a sign-in method for Firebase authentication.](images/image3.png 'image_tooltip')
 
 4. Click on the Google provider in the Sign-in providers list.
 5. Turn the switch on to enable the Google Provider.
@@ -93,7 +93,7 @@ The sample requires users to be signed-in with an account before they can purcha
 7. Choose an email address for the project support email.
 8. Click Save to confirm changes.
 
-![alt_text](images/image4.png 'image_tooltip')
+![Choose a project support email.](images/image4.png 'image_tooltip')
 
 The sample code loads the authentication method without needing to pass in the Web SDK configuration information because Firebase Hosted Configuration handles this automatically. To learn more about authentication, please visit the Firebase [documentation here](https://firebase.google.com/docs/auth).
 
@@ -101,7 +101,7 @@ The sample code loads the authentication method without needing to pass in the W
 
 1. In the left hand navigation menu for your project in the [Firebase console](https://console.firebase.google.com), click on the “Hosting” option. At the top of the page should be a Get Started link, click on it.
 
-![alt_text](images/image5.png 'image_tooltip')
+![Firebase Hosting is outlined in Firebase console menu.](images/image5.png 'image_tooltip')
 
 2. The Get Started button will provide the command to install the [Firebase CLI](https://github.com/firebase/firebase-tools). That command is:
 
@@ -148,15 +148,15 @@ A large portion of granting purchase entitlements is controlled from the backend
 
    **Note:** If you don’t have a billing account yet, Firebase will take you to the flow to create a billing account. Complete the steps to create a billing account, and go back to Step 1.
 
-![alt_text](images/image6.png 'image_tooltip')
+![Setup billing account with Blaze plan.](images/image6.png 'image_tooltip')
 
 4. Click Purchase to switch to the Blaze billing plan.
 
-![alt_text](images/image7.png 'image_tooltip')
+![Click "Purchase".](images/image7.png 'image_tooltip')
 
 5. You can also set a budget alert to avoid unexpected bills in the confirmation page.
 
-![alt_text](images/image8.png 'image_tooltip')
+![Set a budget alert.](images/image8.png 'image_tooltip')
 
 ## Firebase Cloud Firestore
 
@@ -164,7 +164,7 @@ This sample uses [Firebase Cloud Firestore](https://firebase.google.com/docs/fir
 
 1. To set up Firestore, visit the Firestore tab in the Firebase Console and click Create Database.
 
-![alt_text](images/image9.png 'image_tooltip')
+![Cloud Firestore in Firebase console.](images/image9.png 'image_tooltip')
 
 2. In the first step, choose “production mode” to keep the data private and click Next. The Admin SDK in the sample functions code handles the communications with the database.
 3. In the second step, choose a Cloud Firestore location. Pick something close to your location where your functions are deployed. Then click Enable.
@@ -363,7 +363,7 @@ $ bubblewrap init --manifest https://<project.id>.web.app/manifest.json
 
 This init command will parse the manifest and prompt you to enter or confirm values for your Android project. Fill out the “Application name” and “Short name” as you would like your app name to appear (note that you are restricted to 12 characters for “short name”).
 
-![alt_text](images/image10.png 'image_tooltip')
+![Bubblewrap init prompt for app info.](images/image10.png 'image_tooltip')
 
 If you have an existing listing in the Play Store:
 
@@ -379,7 +379,7 @@ If you’re planning to create a new listing:
 
 When the prompt asks you whether to enable Play Billing, respond “Yes”.
 
-![alt_text](images/image11.png 'image_tooltip')
+![Bubblewrap init prompt for enabling Play Billing feature.](images/image11.png 'image_tooltip')
 
 ### Build
 
@@ -402,13 +402,13 @@ Note that if you skipped the step for updating your Digital Asset Links above, y
 
 Follow the tasks in the “Set up your app” section in the dashboard before moving on.
 
-![alt_text](images/image12.png 'image_tooltip')
+![In Play Console app Dashboard, the "Set up your app" checklist.](images/image12.png 'image_tooltip')
 
 ### Upload your package
 
 1. We recommend you to publish to Internal Testing Track to speed up the time to start testing in the Play Store. You can access the Internal Testing Track by choosing on Internal testing on the left hand side menu.
 
-![alt_text](images/image13.png 'image_tooltip')
+![In Play Console, Internal testing page.](images/image13.png 'image_tooltip')
 
 2. Click on the “Create new release” button.
 3. If you haven’t uploaded a package before, Play Console will offer you to opt in for Play App Signing. This is highly recommended. Click Continue to opt in.
@@ -423,17 +423,17 @@ Follow the tasks in the “Set up your app” section in the dashboard before mo
 
 1. Click on Testers tab under Internal testing page
 
-![alt_text](images/image14.png 'image_tooltip')
+![Add testers on the Internal testing page.](images/image14.png 'image_tooltip')
 
 2. Either click on “Create email list” to create a new testers list. Add email addresses of your testers into this list and save. You can also edit an existing list by clicking on the right arrow button.
 3. Enable your testers list by clicking on the checkbox next to it.
 4. Save changes.
 
-![alt_text](images/image15.png 'image_tooltip')
+![Enable testers list by clicking checkbox for each list name.](images/image15.png 'image_tooltip')
 
 5. Click on the Copy link button under the “How testers join your test” to retrieve the URL to your testing track. Share this link with your testers. Testers need to follow this link and opt-in for receiving the testing version first to install your app.
 
-![alt_text](images/image16.png 'image_tooltip')
+![Copy link for URL to your testing track.](images/image16.png 'image_tooltip')
 
 ## Run the app
 
@@ -550,7 +550,7 @@ Like in our sample, it is highly recommended that you verify purchases and token
 
 To [link your Google Cloud project in the Play Console](https://developers.google.com/android-publisher/getting_started#using_an_existing_api_project), go to the “API access” section in the left-hand navigation general user menu (not the app menu). This is under “Settings” > “Developer account” > “API access”.
 
-![alt_text](images/image17.png 'image_tooltip')
+![In Play Console, API access page.](images/image17.png 'image_tooltip')
 
 You can either “Link an existing project” or “Create a new project”. If you don’t see your existing project in the drop-down menu, first verify that the email you’ve used for your developer Play Console account is listed as an “Owner” in the [API Console](https://console.developers.google.com/iam-admin/) and that it has the Google Play Android Developer API enabled in the [API Library](https://console.developers.google.com/apis/library) (it may take up to a couple hours after you’ve done these for your project to be listed in the Play Console).
 
@@ -566,32 +566,31 @@ If you don’t have a service account, follow these instructions to create a new
 
 1. Click “Create new service account”
 
-![alt_text](images/image18.png 'image_tooltip')
+![Create a new service account on the API access page.](images/image18.png 'image_tooltip')
 
 2. Follow the instructions and go to the [Google Cloud Platform](https://console.developers.google.com/iam-admin/serviceaccounts/project?project=498462053203) and click “+CREATE SERVICE ACCOUNT”.
 3. Fill in the details and click “Create”.
 4. Then complete step “2. Grant this service account access to project”. Though it is labeled optional, it isn’t in our case. We recommend adding the “Service Accounts” > “Service Account User” role.
 
-![alt_text](images/image19.png 'image_tooltip')
+![On Google Cloud Platform, grant "Service Account User" role to service account.](images/image19.png 'image_tooltip')
 
 5. Step 3 is optional as labeled. Click Done to save your service account.
 6. Now go back to the Play Console, and click “Refresh service accounts” to see your new service account listed. Then click “Grant access” to give it permissions.
 
-![alt_text](images/image20.png 'image_tooltip')
+![In Play Console, click to grant access to service account.](images/image20.png 'image_tooltip')
+![In Play Console, the app permissions tab.](images/image22.png 'image_tooltip')
 
 7. Make sure “Manage orders and subscriptions permission” is checked.
 
-![alt_text](images/image21.png 'image_tooltip')
+![Enable "Manage orders and subscriptions permission" for service account.](images/image21.png 'image_tooltip')
 
 8. Click “Invite user”.
-
-![alt_text](images/image22.png 'image_tooltip')
 
 ## Create service account key
 
 Go back to the [Google Cloud Platform](https://console.developers.google.com/iam-admin/serviceaccounts/project?project=498462053203). You may see that for the service account we just created/used, it says “No keys” under “Key ID”.
 
-![alt_text](images/image23.png 'image_tooltip')
+![On Google Cloud Platform, table of service accounts.](images/image23.png 'image_tooltip')
 
 To create a new key:
 
@@ -623,25 +622,25 @@ To set up RTDN, first sign in to the [Google API Console](https://console.develo
 
 Navigate to “APIs & Services” in the left hand menu. Then click “+ ENABLE APIS AND SERVICES”, search for “Cloud Pub/Sub API” and enable it.
 
-![alt_text](images/image24.png 'image_tooltip')
+![In Google Cloud Console, enable APIs and services.](images/image24.png 'image_tooltip')
 
 Then to create your Pub/Sub topic, go to the [Pub/Sub topics page](https://console.cloud.google.com/cloudpubsub/topicList) in the Cloud Console and click “+ CREATE TOPIC”.
 
 Fill in the “Topic ID” and note down the full topic name for later.
 
-![alt_text](images/image25.png 'image_tooltip')
+![Create a topic ID and below it the full topic name is outlined.](images/image25.png 'image_tooltip')
 
 Then click on “ADD MEMBER” to add [google-play-developer-notifications@system.gserviceaccount.com](mailto:google-play-developer-notifications@system.gserviceaccount.com) with the “Pub/Sub Publisher” role which allows it to publish messages to the topic you’ve created.
 
-![alt_text](images/image26.png 'image_tooltip')
+![Add the service account as a member to the topic.](images/image26.png 'image_tooltip')
 
-![alt_text](images/image27.png 'image_tooltip')
+![Add the service account email with "Pub/Sub Publisher" role.](images/image27.png 'image_tooltip')
 
 ## Play Console setup
 
 Now that you’ve created a topic and added the Google Play developer notifications account, you’ll need to set up RTDN in your app in the Play Console. In the left-hand navigation menu, scroll down to the “Monetize” section and select “Monetization setup”. Add your topic name which we noted down earlier from the Pub/Sub console. Click “Save changes”.
 
-![alt_text](images/image28.png 'image_tooltip')
+![In Play Console, add full topic name for RTDN.](images/image28.png 'image_tooltip')
 
 ## Backend setup
 
@@ -708,6 +707,6 @@ To add license testing accounts:
 2. Fill in the “Add license testers” field.
 3. Click “Save changes”
 
-![alt_text](images/image29.png 'image_tooltip')
+![In Play Console, add license testers.](images/image29.png 'image_tooltip')
 
 See [Test your Google Play Billing Library integration](https://developer.android.com/google/play/billing/test) article for more information on License Testers and various test cases for different in-app products.
