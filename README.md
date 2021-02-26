@@ -10,7 +10,6 @@
   - [Firebase Functions](#firebase-functions)
   - [Firebase Cloud Firestore](#firebase-cloud-firestore)
 - [First deploy](#first-deploy)
-  - [Deploy](#deploy)
 - [Google Play Console setup](#google-play-console-setup)
   - [General setup](#general-setup)
   - [Package your PWA with Bubblewrap](#package-your-pwa-with-bubblewrap)
@@ -18,7 +17,7 @@
     - [Initialize project](#initialize-project)
     - [Build](#build)
   - [Upload your app to Google Play](#upload-your-app-to-google-play)
-    - [**Only if you have a new listing**](#only-if-you-have-a-new-listing)
+    - [Only if you have a new listing](#only-if-you-have-a-new-listing)
     - [Upload your package](#upload-your-package)
     - [Choose Testers](#choose-testers)
   - [Run the app](#run-the-app)
@@ -323,8 +322,6 @@ There are three key collections of data as shown below (Note that the document i
 
 # First deploy
 
-## Deploy
-
 After setting up Firebase, you can deploy just the hosting content first:
 
 ```
@@ -401,7 +398,7 @@ Note that if you skipped the step for updating your Digital Asset Links above, y
 
 ## Upload your app to Google Play
 
-### **Only if you have a new listing**
+### Only if you have a new listing
 
 Follow the tasks in the “Set up your app” section in the dashboard before moving on.
 
@@ -516,7 +513,7 @@ To link your web application to the Android app, you will also need to reference
 
 In order to publish your app to the Google Play Store and have your app be connected to the Play Store for purchasing, users need to use Digital Asset Links to validate that relationship. In our sample, this is done by publishing a Digital Asset Links JSON file at `https://<project.id>.web.app/.well-known/assetlinks.json`.
 
-Update the [./src/.well-known/assetlinks.json file](https://github.com/chromeos/twa-sample/blob/main/src/.well-known/assetlinks.json) by replacing `<PLAY_PACKAGE_NAME>` with your app’s package name and `<SIGNING_KEY_CERT>` with your signing key’s SHA-256 fingerprint. You can find the SHA-256 certificate fingerprint in “App Integrity” under the “Setup” section in the left hand menu of the Play Console or use this [link](https://play.google.com/console/developers/app/keymanagement) and choose your developer account and then your app to be redirected.
+Update the [./src/.well-known/assetlinks.json file](https://github.com/chromeos/pwa-play-billing/blob/main/src/.well-known/assetlinks.json#L6-L7) by replacing `<PLAY_PACKAGE_NAME>` with your app’s package name and `<SIGNING_KEY_CERT>` with your signing key’s SHA-256 fingerprint. You can find the SHA-256 certificate fingerprint in “App Integrity” under the “Setup” section in the left hand menu of the Play Console or use this [link](https://play.google.com/console/developers/app/keymanagement) and choose your developer account and then your app to be redirected.
 
 ```
 // assetlinks.json
@@ -602,7 +599,7 @@ To create a new key:
 2. In the window opened, click on “Add key” and choose “Create new key”.
 3. Choose your preferred format and click “Create”.
 4. It will then download a file that contains your private key. Store it somewhere safe and secure and **don’t lose it**! If you misplace it, you won’t be able to recover it but you can create another new key.
-5. Use your private key to fill out the missing service account credentials in the [functions/src/config.ts](https://github.com/chromeos/pwa-play-billing/blob/main/functions/src/config.ts#L22-L26) file.
+5. Use your private key to fill out the missing service account credentials in the [functions/src/config.ts](https://github.com/chromeos/pwa-play-billing/blob/main/functions/src/config.ts#L21-L23) file.
 
    1. Fill in the `serviceAccountEmail` const with the `client_email` from the private key file you downloaded.
    2. Copy the entire private key string (`private_key`) as is into the `serviceAccountPrivateKey` const.
@@ -657,7 +654,7 @@ export const rtdnListener = functions.pubsub
  });
 ```
 
-Earlier you added your service account credentials into the [functions/src/config.ts](https://github.com/chromeos/pwa-play-billing/blob/main/functions/src/config.ts#L22-L26) file. Now, replace `<PLAY_PACKAGE_NAME>` with your Android app package name and `<RTDN_TOPIC_ID>` with your RTDN topic ID you created earlier
+Earlier you added your service account credentials into the [functions/src/config.ts](https://github.com/chromeos/pwa-play-billing/blob/main/functions/src/config.ts#L25-L29) file. Now, replace `<PLAY_PACKAGE_NAME>` with your Android app package name and `<RTDN_TOPIC_ID>` with your RTDN topic ID you created earlier
 
 Note that you should just the topic ID (e.g. "play-rtdn") and not the full topic name.
 
