@@ -320,6 +320,10 @@ There are three key collections of data as shown below (Note that the document i
 
 <br/>
 
+# Request an origin trial token
+
+On [line 23 of index.html](https://github.com/chromeos/pwa-play-billing/blob/main/src/index.html#L23), you will see an option to insert an origin trial token. Visit [this link](https://developer.chrome.com/origintrials/#/view_trial/-5451607348931985407) to request an origin trial token for the Digital Goods API. Once you have your origin trial token, you can go and insert it on line 23 in the content attribute which currently holds the value `$ORIGIN_TRIAL_TOKEN`. To learn more about setting up origin trials, please see [this guide](http://googlechrome.github.io/OriginTrials/developer-guide.html).
+
 # First deploy
 
 After setting up Firebase, you can deploy just the hosting content first:
