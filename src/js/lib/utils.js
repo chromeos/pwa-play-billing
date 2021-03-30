@@ -79,3 +79,7 @@ export const VALID_THEME_NAMES = {
   specific_blue: 'blue',
   retro_red: 'red',
 };
+
+export const BASIC_SUB = 'basic_sub';
+
+export const PREMIUM_SUB = 'premium_sub';

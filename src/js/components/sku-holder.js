@@ -15,6 +15,7 @@
  */
 
 import { LitElement, html } from 'lit-element';
+import { PREMIUM_SUB } from '../lib/utils';
 
 import '@material/mwc-button';
 
@@ -107,7 +108,8 @@ class SkuHolder extends LitElement {
         <mwc-button
           ?disabled="${this.purchase === null}"
           raised
-          label="Purchase for ${this.price}"
+          label="${this.details.itemId === PREMIUM_SUB ? 'Upgrade ' : 'Purchase '} for ${this
+            .price}"
           @click="${this.purchase}"
         ></mwc-button>
         ${this.hasConsumeBtn(this.details.purchaseType)}

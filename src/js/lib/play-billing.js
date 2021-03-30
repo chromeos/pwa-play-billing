@@ -151,8 +151,9 @@ export class PlayBillingService {
   /**
    * Request that the provided SKU is purchased. Will acknowledge purchase on success
    * @param {PlayBillingServiceSku|string} purchaseSku - Either the SKU ID to purchase, or the actual SKU
+   * @param {PurchaseDetails} oldPurchase - The previous subscription purchase to be replaced
    */
-  async purchase(purchaseSku) {
+  async purchase(purchaseSku, oldPurchase) {
     if (!this.service || !this.skus) await this.init();
 
     const sku =
@@ -166,6 +167,9 @@ export class PlayBillingService {
         supportedMethods: this.serviceURL,
         data: {
           sku: sku.itemId,
+          oldSku: oldPurchase?.itemId,
+          purchaseToken: oldPurchase?.purchaseToken,
+          prorationmode: 'immediateAndChargeProratedPrice',
         },
       },
     ];
