@@ -90,6 +90,20 @@ class SkuHolder extends LitElement {
   }
 
   /**
+   * purchaseBtn validates whether or not this item is a consumable item or not. Then it indicates to the render function whether to render the HTML.
+   *
+   * @param {string} purchaseType
+   * @return {TemplateResult}
+   * @memberof SkuHolder
+   */
+  purchaseBtnLabel(purchaseType) {
+    if (purchaseType == 'subscription' && this.details.itemId === PREMIUM_SUB) {
+      return html`label="Upgrade for ${this.price}"`;
+    }
+    return html`label="Purchase for ${this.price}"`;
+  }
+
+  /**
    *
    *
    * @return {TemplateResult}
@@ -108,8 +122,7 @@ class SkuHolder extends LitElement {
         <mwc-button
           ?disabled="${this.purchase === null}"
           raised
-          label="${this.details.itemId === PREMIUM_SUB ? 'Upgrade ' : 'Purchase '} for ${this
-            .price}"
+          ${this.purchaseBtnLabel(this.details.purchaseType)}
           @click="${this.purchase}"
         ></mwc-button>
         ${this.hasConsumeBtn(this.details.purchaseType)}

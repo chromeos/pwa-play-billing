@@ -54,6 +54,7 @@ class SkuList extends LitElement {
    */
   render() {
     const basicSubPurchase = this.purchases.find((purchase) => purchase.itemId === BASIC_SUB);
+    const premiumSubPurchase = this.purchases.find((purchase) => purchase.itemId === PREMIUM_SUB);
     return html`${this.skus.map((sku) => {
       // Find if there's a purchase with the same itemId as the SKU
       const purchase = this.purchases.find((purchase) => purchase.itemId === sku.itemId);
@@ -65,11 +66,15 @@ class SkuList extends LitElement {
           ? null
           : async function () {
               let purchaseMade;
-              if (sku.itemId === PREMIUM_SUB) {
+
+              if (sku.itemId === BASIC_SUB && premiumSubPurchase) {
+                purchaseMade = await this.service.purchase(sku.itemId, premiumSubPurchase);
+              } else if (sku.itemId === PREMIUM_SUB) {
                 purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase);
               } else {
                 purchaseMade = await this.service.purchase(sku.itemId);
               }
+
               const { response, valid } = purchaseMade;
               const e = new CustomEvent('sku-purchase', {
                 detail: {
