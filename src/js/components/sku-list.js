@@ -49,6 +49,24 @@ class SkuList extends LitElement {
     this.locale = 'en-US';
     this.type = 'sku';
   }
+
+  /**
+   *
+   * @param {PurchaseDetails} basicSubPurchase
+   * @param {PurchaseDetails} premiumSubPurchase
+   * @param {string} itemId
+   * @return {string}
+   */
+  skuType(basicSubPurchase, premiumSubPurchase, itemId) {
+    if (itemId === BASIC_SUB && premiumSubPurchase) {
+      return 'downgrade';
+    } else if (itemId === PREMIUM_SUB && basicSubPurchase) {
+      return 'upgrade';
+    } else {
+      return this.type;
+    }
+  }
+
   /**
    * @return {TemplateResult}
    */
@@ -58,18 +76,20 @@ class SkuList extends LitElement {
     return html`${this.skus.map((sku) => {
       // Find if there's a purchase with the same itemId as the SKU
       const purchase = this.purchases.find((purchase) => purchase.itemId === sku.itemId);
+      const skuType = this.skuType(basicSubPurchase, premiumSubPurchase, sku.itemId);
       return html` <sku-holder
-        .type="${this.type}"
+        .type="${skuType}"
         .details=${sku}
         price="${this.service.getSkuPrice(sku, this.locale)}"
-        .purchase=${purchase || (sku.itemId === PREMIUM_SUB && !basicSubPurchase)
+        .purchase=${purchase
           ? null
           : async function () {
               let purchaseMade;
-
-              if (sku.itemId === BASIC_SUB && premiumSubPurchase) {
+              if (skuType === 'downgrade') {
+                // downgrade from premium to basic subscription
                 purchaseMade = await this.service.purchase(sku.itemId, premiumSubPurchase);
-              } else if (sku.itemId === PREMIUM_SUB) {
+              } else if (skuType === 'upgrade') {
+                // upgrade from basic to premium subscription
                 purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase);
               } else {
                 purchaseMade = await this.service.purchase(sku.itemId);

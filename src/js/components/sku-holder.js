@@ -15,7 +15,6 @@
  */
 
 import { LitElement, html } from 'lit-element';
-import { PREMIUM_SUB } from '../lib/utils';
 
 import '@material/mwc-button';
 
@@ -90,17 +89,29 @@ class SkuHolder extends LitElement {
   }
 
   /**
-   * purchaseBtn validates whether or not this item is a consumable item or not. Then it indicates to the render function whether to render the HTML.
+   * purchaseBtn determines whether this item is a subscription downgrade or upgrade, or a regular purchase. Then it renders the HTML for it.
    *
-   * @param {string} purchaseType
    * @return {TemplateResult}
    * @memberof SkuHolder
    */
-  purchaseBtnLabel(purchaseType) {
-    if (purchaseType == 'subscription' && this.details.itemId === PREMIUM_SUB) {
-      return html`label="Upgrade for ${this.price}"`;
+  purchaseBtn() {
+    let purchaseVerb;
+    switch (this.type) {
+      case 'upgrade':
+        purchaseVerb = 'Upgrade';
+        break;
+      case 'downgrade':
+        purchaseVerb = 'Downgrade';
+        break;
+      default:
+        purchaseVerb = 'Purchase';
     }
-    return html`label="Purchase for ${this.price}"`;
+    return html`<mwc-button
+      ?disabled="${this.purchase === null}"
+      raised
+      label="${purchaseVerb} for ${this.price}"
+      @click="${this.purchase}"
+    ></mwc-button>`;
   }
 
   /**
@@ -119,13 +130,7 @@ class SkuHolder extends LitElement {
         ${this.type === 'coin'
           ? html``
           : html`<p>You currently ${this.purchase === null ? '' : `don't`} own this item.</p>`}
-        <mwc-button
-          ?disabled="${this.purchase === null}"
-          raised
-          ${this.purchaseBtnLabel(this.details.purchaseType)}
-          @click="${this.purchase}"
-        ></mwc-button>
-        ${this.hasConsumeBtn(this.details.purchaseType)}
+        ${this.purchaseBtn()} ${this.hasConsumeBtn(this.details.purchaseType)}
       </div>
     `;
   }
