@@ -85,16 +85,19 @@ class SkuList extends LitElement {
           ? null
           : async function () {
               let purchaseMade;
-              if (skuType === 'downgrade') {
-                // downgrade from premium to basic subscription
-                purchaseMade = await this.service.purchase(sku.itemId, premiumSubPurchase);
-              } else if (skuType === 'upgrade') {
-                // upgrade from basic to premium subscription
-                purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase);
-              } else {
-                purchaseMade = await this.service.purchase(sku.itemId);
+              switch (skuType) {
+                case 'downgrade':
+                  // downgrade from premium to basic subscription
+                  purchaseMade = await this.service.purchase(sku.itemId, premiumSubPurchase);
+                  break;
+                case 'upgrade':
+                  // upgrade from basic to premium subscription
+                  purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase);
+                  break;
+                default:
+                  // make a normal purchase
+                  purchaseMade = await this.service.purchase(sku.itemId);
               }
-
               const { response, valid } = purchaseMade;
               const e = new CustomEvent('sku-purchase', {
                 detail: {
