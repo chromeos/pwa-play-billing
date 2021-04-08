@@ -88,11 +88,15 @@ class SkuList extends LitElement {
               switch (skuType) {
                 case 'downgrade':
                   // downgrade from premium to basic subscription
-                  purchaseMade = await this.service.purchase(sku.itemId, premiumSubPurchase);
+                  purchaseMade = await this.service.purchase(
+                    sku.itemId,
+                    premiumSubPurchase,
+                    skuType,
+                  );
                   break;
                 case 'upgrade':
                   // upgrade from basic to premium subscription
-                  purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase);
+                  purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase, skuType);
                   break;
                 default:
                   // make a normal purchase
