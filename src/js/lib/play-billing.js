@@ -162,7 +162,11 @@ export class PlayBillingService {
         ? this.skus.find((s) => s.itemId === purchaseSku)
         : purchaseSku;
 
-    // Set appropriate proration mode based on scenario. See https://developer.android.com/google/play/billing/subscriptions#proration-recommendations for more information about the different proration modes and recommendations.
+    /* 
+    Set appropriate proration mode based on scenario. 
+    See https://developer.android.com/google/play/billing/subscriptions#proration-recommendations
+    for more information about the different proration modes and recommendations.
+    */
     let prorationMode = 'deferred';
     if (subType === 'upgrade') {
       prorationMode = 'immediateAndChargeProratedPrice';
