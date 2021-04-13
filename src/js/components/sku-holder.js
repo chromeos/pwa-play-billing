@@ -89,6 +89,32 @@ class SkuHolder extends LitElement {
   }
 
   /**
+   * purchaseBtn determines whether this item is a subscription downgrade or upgrade, or a regular purchase. Then it renders the HTML for it.
+   *
+   * @return {TemplateResult}
+   * @memberof SkuHolder
+   */
+  purchaseBtn() {
+    let purchaseVerb;
+    switch (this.type) {
+      case 'upgrade':
+        purchaseVerb = 'Upgrade';
+        break;
+      case 'downgrade':
+        purchaseVerb = 'Downgrade';
+        break;
+      default:
+        purchaseVerb = 'Purchase';
+    }
+    return html`<mwc-button
+      ?disabled="${this.purchase === null}"
+      raised
+      label="${purchaseVerb} for ${this.price}"
+      @click="${this.purchase}"
+    ></mwc-button>`;
+  }
+
+  /**
    *
    *
    * @return {TemplateResult}
@@ -104,13 +130,7 @@ class SkuHolder extends LitElement {
         ${this.type === 'coin'
           ? html``
           : html`<p>You currently ${this.purchase === null ? '' : `don't`} own this item.</p>`}
-        <mwc-button
-          ?disabled="${this.purchase === null}"
-          raised
-          label="Purchase for ${this.price}"
-          @click="${this.purchase}"
-        ></mwc-button>
-        ${this.hasConsumeBtn(this.details.purchaseType)}
+        ${this.purchaseBtn()} ${this.hasConsumeBtn(this.details.purchaseType)}
       </div>
     `;
   }

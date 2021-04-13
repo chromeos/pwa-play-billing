@@ -15,6 +15,7 @@
  */
 
 import { LitElement, html } from 'lit-element';
+import { BASIC_SUB, PREMIUM_SUB } from '../lib/utils';
 
 /**
  * SkuList holds a list of skus.
@@ -48,21 +49,60 @@ class SkuList extends LitElement {
     this.locale = 'en-US';
     this.type = 'sku';
   }
+
+  /**
+   *
+   * @param {PurchaseDetails} basicSubPurchase
+   * @param {PurchaseDetails} premiumSubPurchase
+   * @param {string} itemId
+   * @return {string}
+   */
+  skuType(basicSubPurchase, premiumSubPurchase, itemId) {
+    if (itemId === BASIC_SUB && premiumSubPurchase) {
+      return 'downgrade';
+    } else if (itemId === PREMIUM_SUB && basicSubPurchase) {
+      return 'upgrade';
+    } else {
+      return this.type;
+    }
+  }
+
   /**
    * @return {TemplateResult}
    */
   render() {
+    const basicSubPurchase = this.purchases.find((purchase) => purchase.itemId === BASIC_SUB);
+    const premiumSubPurchase = this.purchases.find((purchase) => purchase.itemId === PREMIUM_SUB);
     return html`${this.skus.map((sku) => {
       // Find if there's a purchase with the same itemId as the SKU
       const purchase = this.purchases.find((purchase) => purchase.itemId === sku.itemId);
+      const skuType = this.skuType(basicSubPurchase, premiumSubPurchase, sku.itemId);
       return html` <sku-holder
-        .type="${this.type}"
+        .type="${skuType}"
         .details=${sku}
         price="${this.service.getSkuPrice(sku, this.locale)}"
         .purchase=${purchase
           ? null
           : async function () {
-              const { response, valid } = await this.service.purchase(sku.itemId);
+              let purchaseMade;
+              switch (skuType) {
+                case 'downgrade':
+                  // downgrade from premium to basic subscription
+                  purchaseMade = await this.service.purchase(
+                    sku.itemId,
+                    premiumSubPurchase,
+                    skuType,
+                  );
+                  break;
+                case 'upgrade':
+                  // upgrade from basic to premium subscription
+                  purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase, skuType);
+                  break;
+                default:
+                  // make a normal purchase
+                  purchaseMade = await this.service.purchase(sku.itemId);
+              }
+              const { response, valid } = purchaseMade;
               const e = new CustomEvent('sku-purchase', {
                 detail: {
                   sku,

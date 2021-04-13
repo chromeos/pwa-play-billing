@@ -151,8 +151,10 @@ export class PlayBillingService {
   /**
    * Request that the provided SKU is purchased. Will acknowledge purchase on success
    * @param {PlayBillingServiceSku|string} purchaseSku - Either the SKU ID to purchase, or the actual SKU
+   * @param {PurchaseDetails} oldPurchase - The previous subscription purchase to be replaced
+   * @param {string} subType - The type of subscription purchase (upgrade, downgrade, or normal purchase)
    */
-  async purchase(purchaseSku) {
+  async purchase(purchaseSku, oldPurchase, subType) {
     if (!this.service || !this.skus) await this.init();
 
     const sku =
@@ -160,12 +162,24 @@ export class PlayBillingService {
         ? this.skus.find((s) => s.itemId === purchaseSku)
         : purchaseSku;
 
+    /* 
+    Set appropriate proration mode based on scenario. 
+    See https://developer.android.com/google/play/billing/subscriptions#proration-recommendations
+    for more information about the different proration modes and recommendations.
+    */
+    let prorationMode = 'deferred';
+    if (subType === 'upgrade') {
+      prorationMode = 'immediateAndChargeProratedPrice';
+    }
     // Build payment request
     const paymentMethod = [
       {
         supportedMethods: this.serviceURL,
         data: {
           sku: sku.itemId,
+          oldSku: oldPurchase?.itemId,
+          purchaseToken: oldPurchase?.purchaseToken,
+          prorationMode: prorationMode,
         },
       },
     ];

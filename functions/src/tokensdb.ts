@@ -92,7 +92,7 @@ function addNewToken(
   return tokensRef
     .add(newTokenData)
     .then((docRef) => {
-      console.log(`New token added with ID : ${docRef.id}`);
+      console.log(`New token added with doc ID : ${docRef.id}`);
       return true;
     })
     .catch(function (error): boolean {
@@ -143,7 +143,7 @@ export async function invalidateToken(purchaseToken: string): Promise<number> {
     await Promise.all(
       // Found some tokens that match, invalidate them
       querySnapshot.docs.map(async (docSnapshot) => {
-        docSnapshot.ref
+        await docSnapshot.ref
           .update({ isValid: false })
           .then(() => {
             console.log('Token successfully invalidated!');
