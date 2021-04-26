@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-import { LitElement, html } from 'lit-element';
+import { LitElement, html } from 'lit';
 import './profile-menu';
 
 /**

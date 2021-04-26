@@ -59,7 +59,7 @@
     "@material/mwc-top-app-bar-fixed": "^0.20.0",
     "@webcomponents/webcomponentsjs": "^2.4.4",
     "change-case": "^4.1.2",
-    "lit-element": "^2.4.0",
+    "lit": "^2.0.0-rc.1",
     "svelte": "^3.32.0",
     "workbox-cacheable-response": "^6.0.2",
     "workbox-precaching": "^5.1.4",
