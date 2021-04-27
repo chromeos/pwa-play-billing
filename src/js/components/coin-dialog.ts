@@ -67,7 +67,7 @@ class CoinDialog extends LitElement {
    * @memberof CoinDialog
    */
   firstUpdated() {
-    const dialog = this._coinDialog as Dialog;
+    const dialog = this._coinDialog;
     dialog.addEventListener('closing', () => {
       const e = new CustomEvent('coin-dialog-close', {
         detail: {},
@@ -85,7 +85,7 @@ class CoinDialog extends LitElement {
    */
   show() {
     console.log('show called');
-    const dialog = this._coinDialog as Dialog;
+    const dialog = this._coinDialog;
     dialog.show();
   }
 
@@ -96,7 +96,7 @@ class CoinDialog extends LitElement {
    */
   close() {
     console.log('close called');
-    const dialog = this._coinDialog as Dialog;
+    const dialog = this._coinDialog;
     dialog.close();
   }
 }
