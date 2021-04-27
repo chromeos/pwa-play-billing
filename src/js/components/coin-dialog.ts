@@ -30,7 +30,6 @@ import { Dialog } from '@material/mwc-dialog';
  */
 @customElement('coin-dialog')
 class CoinDialog extends LitElement {
-
   @property() coinSkus = [];
   @property() service = {};
   @property() locale = 'en-US';
