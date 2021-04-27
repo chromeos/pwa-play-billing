@@ -15,13 +15,6 @@
  */
 
 /* global firebase */
-// Imports Firebase from [reserved URLs](https://firebase.google.com/docs/hosting/reserved-urls)
-import '/__/firebase/8.2.4/firebase-app.js';
-import '/__/firebase/8.2.4/firebase-auth.js';
-import '/__/firebase/8.2.4/firebase-firestore.js';
-import '/__/firebase/8.2.4/firebase-functions.js';
-import '/__/firebase/init.js';
-
 import { authenticated } from './application-store';
 
 /**
@@ -37,6 +30,29 @@ export class Firebase {
     // Firebase initialization
     this.appBar = appBar;
     this.log = log;
+
+    this.init();
+
+    this.appBar.addEventListener('sign-in', this.login.bind(this));
+    this.appBar.addEventListener('sign-out', this.logout.bind(this));
+  }
+
+  /**
+   * Async initialization to import Firebase hosting URLs
+   */
+  async init() {
+    // Imports Firebase from [reserved URLs](https://firebase.google.com/docs/hosting/reserved-urls)
+    const hostingURLs = [
+      '/__/firebase/8.2.4/firebase-app.js',
+      '/__/firebase/8.2.4/firebase-auth.js',
+      '/__/firebase/8.2.4/firebase-firestore.js',
+      '/__/firebase/8.2.4/firebase-functions.js',
+      '/__/firebase/init.js',
+    ];
+
+    for (const external of hostingURLs) {
+      await import(external /* @vite-ignore */);
+    }
 
     this.firebase = firebase;
     this.provider = new firebase.auth.GoogleAuthProvider();
@@ -59,9 +75,6 @@ export class Firebase {
         this.appBar.setAttribute('photourl', '');
       }
     });
-
-    this.appBar.addEventListener('sign-in', this.login.bind(this));
-    this.appBar.addEventListener('sign-out', this.logout.bind(this));
   }
 
   /**

@@ -14,30 +14,32 @@
  *  limitations under the License.
  */
 
-const httpProxy = require('http-proxy');
-const proxy = httpProxy.createServer({ target: 'http://localhost:5000' });
+const { resolve } = require('path');
 
 module.exports = {
-  mount: {
-    src: '/',
-  },
-  routes: [
-    {
-      src: '/__/firebase/.*',
-      dest: (req, res) => proxy.web(req, res),
-      match: 'all',
+  root: 'src',
+  clearScreen: false,
+  assetsInclude: ['manifest.json'],
+  build: {
+    outDir: '../build',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'src', 'index.html'),
+        missing: resolve(__dirname, 'src/404.html'),
+      },
     },
-    {
-      src: '/api/.*',
-      dest: (req, res) => proxy.web(req, res),
-      match: 'all',
-    },
-  ],
-  devOptions: {
-    output: 'stream',
   },
-  plugins: [
-    ['./sw.snowpack-plugin.js', { file: 'service-worker.js' }],
-    ['@snowpack/plugin-optimize'],
-  ],
+  server: {
+    proxy: {
+      '/__/firebase': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+    },
+  },
 };
