@@ -15,11 +15,12 @@
  */
 
 import { LitElement, html } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
 
-import '@material/mwc-dialog';
 import '@material/mwc-button';
 
 import './sku-list';
+import { Dialog } from '@material/mwc-dialog';
 
 /**
  *
@@ -27,32 +28,13 @@ import './sku-list';
  * @class CoinDialog
  * @extends {LitElement}
  */
+@customElement('coin-dialog')
 class CoinDialog extends LitElement {
-  /**
-   *
-   *
-   * @readonly
-   * @static
-   * @memberof CoinDialog
-   */
-  static get properties() {
-    return {
-      coinSkus: { type: Array },
-      service: { type: Object }, // Instance of PlayBillingService, see 'src/js/lib/play-billing.js'
-      locale: { type: String },
-    };
-  }
+  @property() coinSkus = [];
+  @property() service = {};
+  @property() locale = 'en-US';
 
-  /**
-   * Creates an instance of CoinDialog.
-   * @memberof CoinDialog
-   */
-  constructor() {
-    super();
-    this.coinSkus = [];
-    this.service = {};
-    this.locale = 'en-US';
-  }
+  @query('#coin-dialog') _coinDialog!: Dialog;
 
   /**
    *
@@ -84,7 +66,7 @@ class CoinDialog extends LitElement {
    * @memberof CoinDialog
    */
   firstUpdated() {
-    const dialog = this.shadowRoot.getElementById('coin-dialog');
+    const dialog = this._coinDialog;
     dialog.addEventListener('closing', () => {
       const e = new CustomEvent('coin-dialog-close', {
         detail: {},
@@ -102,7 +84,7 @@ class CoinDialog extends LitElement {
    */
   show() {
     console.log('show called');
-    const dialog = this.shadowRoot.getElementById('coin-dialog');
+    const dialog = this._coinDialog;
     dialog.show();
   }
 
@@ -113,9 +95,7 @@ class CoinDialog extends LitElement {
    */
   close() {
     console.log('close called');
-    const dialog = this.shadowRoot.getElementById('coin-dialog');
+    const dialog = this._coinDialog;
     dialog.close();
   }
 }
-
-customElements.define('coin-dialog', CoinDialog);
