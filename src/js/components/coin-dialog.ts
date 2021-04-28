@@ -20,7 +20,8 @@ import { customElement, property, query } from 'lit/decorators.js';
 import '@material/mwc-button';
 
 import './sku-list';
-import { Dialog } from '@material/mwc-dialog';
+import '@material/mwc-dialog';
+import {Dialog} from '@material/mwc-dialog';
 
 /**
  *
@@ -29,7 +30,7 @@ import { Dialog } from '@material/mwc-dialog';
  * @extends {LitElement}
  */
 @customElement('coin-dialog')
-class CoinDialog extends LitElement {
+export class CoinDialog extends LitElement {
   @property() coinSkus = [];
   @property() service = {};
   @property() locale = 'en-US';
