@@ -37,7 +37,7 @@ export class ThemePicker extends LitElement {
   @property() purchasedTheme = '';
   @property() _currentSelection = '';
   
-  @query('#coin-dialog') _themeSelect!: Select;
+  @query('#theme-select') _themeSelect!: Select;
 
   /**
    *
