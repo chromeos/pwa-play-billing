@@ -15,10 +15,13 @@
  */
 
 import { LitElement, html } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
 import { capitalCase } from 'capital-case';
 
 import '@material/mwc-select';
 import '@material/mwc-button';
+
+import {Select} from '@material/mwc-select';
 
 import './sku-list';
 
@@ -28,31 +31,13 @@ import './sku-list';
  * @class ThemePicker
  * @extends {LitElement}
  */
-class ThemePicker extends LitElement {
-  /**
-   *
-   *
-   * @readonly
-   * @static
-   * @memberof ThemePicker
-   */
-  static get properties() {
-    return {
-      themes: { type: Array },
-      purchasedTheme: { type: String },
-    };
-  }
-
-  /**
-   * Creates an instance of ThemePicker.
-   * @memberof ThemePicker
-   */
-  constructor() {
-    super();
-    this.themes = [''];
-    this.purchasedTheme = '';
-    this._currentSelection = '';
-  }
+@customElement('theme-picker')
+export class ThemePicker extends LitElement {
+  @property() themes = [];
+  @property() purchasedTheme = '';
+  @property() _currentSelection = '';
+  
+  @query('#coin-dialog') _themeSelect!: Select;
 
   /**
    *
@@ -87,7 +72,7 @@ class ThemePicker extends LitElement {
    * @memberof ThemePicker
    */
   firstUpdated() {
-    const themeSelector = this.shadowRoot.getElementById('theme-select');
+    const themeSelector = this._themeSelect;
     themeSelector.addEventListener('selected', this._onSelected.bind(this));
   }
 
@@ -98,7 +83,7 @@ class ThemePicker extends LitElement {
    * @return {*}
    * @memberof ThemePicker
    */
-  _formatTitle(themeName) {
+  _formatTitle(themeName: string) {
     return capitalCase(themeName.replace(/_/g, ' '));
   }
 
@@ -108,7 +93,7 @@ class ThemePicker extends LitElement {
    * @memberof ThemePicker
    */
   _onSelected() {
-    const themeSelector = this.shadowRoot.getElementById('theme-select');
+    const themeSelector = this._themeSelect;
     this._currentSelection = themeSelector.value;
     this.requestUpdate();
     if (this.themes != undefined) {
@@ -129,7 +114,7 @@ class ThemePicker extends LitElement {
    * @memberof ThemePicker
    */
   resetPickerSelection() {
-    const themeSelector = this.shadowRoot.getElementById('theme-select');
+    const themeSelector = this._themeSelect;
     themeSelector.items.forEach((item) => {
       if (item.value == this.purchasedTheme) {
         item.selected = true;
@@ -145,7 +130,7 @@ class ThemePicker extends LitElement {
    * @memberof ThemePicker
    */
   _onNewThemePurchased() {
-    const themeSelector = this.shadowRoot.getElementById('theme-select');
+    const themeSelector = this._themeSelect;
     const e = new CustomEvent('color-purchased', {
       detail: {
         selectedColor: themeSelector.value,
@@ -156,5 +141,3 @@ class ThemePicker extends LitElement {
     this.dispatchEvent(e);
   }
 }
-
-customElements.define('theme-picker', ThemePicker);
