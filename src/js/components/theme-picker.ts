@@ -19,9 +19,9 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { capitalCase } from 'capital-case';
 
 import '@material/mwc-select';
+import {Select} from '@material/mwc-select';
 import '@material/mwc-button';
 
-import {Select} from '@material/mwc-select';
 
 import './sku-list';
 
