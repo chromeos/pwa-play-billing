@@ -14,13 +14,14 @@
  *  limitations under the License.
  */
 
-import { LitElement, html } from 'lit';
+import { LitElement, html, HTMLTemplateResult } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 
 import '@material/mwc-button';
 
 import './sku-list';
-import { Dialog } from '@material/mwc-dialog';
+import '@material/mwc-dialog';
+import {Dialog} from '@material/mwc-dialog';
 
 /**
  *
@@ -29,10 +30,10 @@ import { Dialog } from '@material/mwc-dialog';
  * @extends {LitElement}
  */
 @customElement('coin-dialog')
-class CoinDialog extends LitElement {
-  @property() coinSkus = [];
-  @property() service = {};
-  @property() locale = 'en-US';
+export class CoinDialog extends LitElement {
+  @property() coinSkus: Array<string> = [];
+  @property() service: object = {};
+  @property() locale: string = 'en-US';
 
   @query('#coin-dialog') _coinDialog!: Dialog;
 
@@ -42,7 +43,7 @@ class CoinDialog extends LitElement {
    * @return {*}
    * @memberof CoinDialog
    */
-  render() {
+  render(): HTMLTemplateResult {
     return html`
       <mwc-dialog id="coin-dialog" heading="Purchase coins">
         <slot name="theme"></slot>
@@ -65,7 +66,7 @@ class CoinDialog extends LitElement {
    *
    * @memberof CoinDialog
    */
-  firstUpdated() {
+  firstUpdated(): void {
     const dialog = this._coinDialog;
     dialog.addEventListener('closing', () => {
       const e = new CustomEvent('coin-dialog-close', {
@@ -82,7 +83,7 @@ class CoinDialog extends LitElement {
    *
    * @memberof CoinDialog
    */
-  show() {
+  show():void  {
     console.log('show called');
     const dialog = this._coinDialog;
     dialog.show();
@@ -93,7 +94,7 @@ class CoinDialog extends LitElement {
    *
    * @memberof CoinDialog
    */
-  close() {
+  close(): void {
     console.log('close called');
     const dialog = this._coinDialog;
     dialog.close();
