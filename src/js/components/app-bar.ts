@@ -14,8 +14,11 @@
  *  limitations under the License.
  */
 
-import { LitElement, html } from 'lit';
+import { IconButton } from '@material/mwc-icon-button';
+import { LitElement, html, HTMLTemplateResult } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
 import './profile-menu';
+import { ProfileMenu } from './profile-menu';
 
 /**
  * AppBar is a class that shows a bar at the top of the screen with options for signing in and signing out users.
@@ -23,39 +26,22 @@ import './profile-menu';
  * @class AppBar
  * @extends {LitElement}
  */
-class AppBar extends LitElement {
-  /**
-   * properties defines a set of user properties that can be set by a user.
-   *
-   * @readonly
-   * @static
-   * @memberof AppBar
-   */
-  static get properties() {
-    return {
-      title: { type: String },
-      photoURL: { type: String, reflect: true },
-      coinAmt: { type: Number },
-    };
-  }
+@customElement('app-bar')
+export class AppBar extends LitElement {
+  @property() title: string = '';
+  @property() photoURL: string = '';
+  @property() coinAmt: number = 0;
 
-  /**
-   * Creates an instance of AppBar.
-   * @memberof AppBar
-   */
-  constructor() {
-    super();
-    this.photoURL = '';
-    this.coinAmt = 0;
-  }
-
+  @query('#profile-menu') _profileMenu!: ProfileMenu;
+  @query('#login_btn') _loginBtn!: IconButton;
+  
   /**
    * render shows the lit-element to the user and runs the templating engine.
    *
    * @return {*}
    * @memberof AppBar
    */
-  render() {
+  render(): HTMLTemplateResult {
     return html`
       <mwc-top-app-bar-fixed>
         <div slot="title">${this.title}</div>
@@ -89,7 +75,7 @@ class AppBar extends LitElement {
    *
    * @memberof AppBar
    */
-  _showCoinMenu() {
+  _showCoinMenu(): void {
     const event = new CustomEvent('show-coin-menu', {
       detail: {
         type: true,
@@ -101,16 +87,15 @@ class AppBar extends LitElement {
   /**
    * firstUpdated overrides the firstUpdated method of the LitElement class so it executes on the first update of the app.
    *
-   * @param {*} props
    * @memberof AppBar
    */
-  firstUpdated(props) {
+  firstUpdated(): void {
     console.log(this.photoURL);
-    const profileMenu = this.shadowRoot.getElementById('profile-menu');
-    profileMenu.addEventListener('sign-in', (e) => {
+    const profileMenu = this._profileMenu;
+    profileMenu.addEventListener('sign-in', () => {
       this._dispatchSignInRequest('sign-in');
     });
-    profileMenu.addEventListener('sign-out', (e) => {
+    profileMenu.addEventListener('sign-out', () => {
       this._dispatchSignInRequest('sign-out');
     });
   }
@@ -121,7 +106,7 @@ class AppBar extends LitElement {
    * @param {*} type
    * @memberof AppBar
    */
-  _dispatchSignInRequest(type) {
+  _dispatchSignInRequest(type: string): void {
     const event = new CustomEvent(type, {
       detail: {
         type: true,
@@ -135,12 +120,10 @@ class AppBar extends LitElement {
    *
    * @memberof AppBar
    */
-  _showMenu() {
-    const profileMenu = this.shadowRoot.getElementById('profile-menu');
-    const iconBtn = this.shadowRoot.getElementById('login_btn');
+  _showMenu(): void {
+    const profileMenu = this._profileMenu;
+    const iconBtn = this._loginBtn;
     profileMenu.setAnchor(iconBtn);
     profileMenu.show();
   }
 }
-
-customElements.define('app-bar', AppBar);

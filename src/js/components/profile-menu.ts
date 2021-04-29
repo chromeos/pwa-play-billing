@@ -14,10 +14,12 @@
  *  limitations under the License.
  */
 
-import { LitElement, html } from 'lit';
+import { LitElement, html, HTMLTemplateResult } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
 
 import '@material/mwc-menu';
 import '@material/mwc-list/mwc-list-item.js';
+import { Menu } from '@material/mwc-menu';
 
 /**
  * ProfileMenu shows the users profile menu and the available options specific to that user.
@@ -25,33 +27,19 @@ import '@material/mwc-list/mwc-list-item.js';
  * @class ProfileMenu
  * @extends {LitElement}
  */
-class ProfileMenu extends LitElement {
-  /**
-   *
-   * @readonly
-   * @static
-   * @memberof ProfileMenu
-   */
-  static get properties() {
-    return {
-      loggedIn: { type: Boolean, reflect: true },
-    };
-  }
+@customElement('profile-menu')
+export class ProfileMenu extends LitElement {
 
-  /**
-   * Creates an instance of ProfileMenu.
-   * @memberof ProfileMenu
-   */
-  constructor() {
-    super();
-    this.loggedIn = false;
-    this.signedOutHtml = html`
+  @property({type: Boolean, reflect: true}) loggedIn: boolean = false;
+  
+  private signedOutHtml: HTMLTemplateResult = html`
       <mwc-list-item @click="${this._requestSignIn}">Sign In</mwc-list-item>
     `;
-    this.signedInHtml = html`
+  private signedInHtml = html`
       <mwc-list-item @click="${this._requestSignOut}">Sign Out</mwc-list-item>
     `;
-  }
+
+  @query('#menu') _menu!: Menu;
 
   /**
    *
@@ -59,7 +47,7 @@ class ProfileMenu extends LitElement {
    * @return {*}
    * @memberof ProfileMenu
    */
-  render() {
+  render(): HTMLTemplateResult {
     return html`
       <div style="position: relative;">
         <mwc-menu id="menu">
@@ -76,7 +64,7 @@ class ProfileMenu extends LitElement {
    *
    * @memberof ProfileMenu
    */
-  _showPlayStore() {
+  _showPlayStore(): void {
     window.open('https://play.google.com/store/apps/details?id=<PLAY_PACKAGE_NAME>', '_blank');
   }
 
@@ -85,7 +73,7 @@ class ProfileMenu extends LitElement {
    *
    * @memberof ProfileMenu
    */
-  _showGitHubPage() {
+  _showGitHubPage(): void {
     window.open('https://github.com/chromeos/pwa-play-billing', '_blank');
   }
 
@@ -94,7 +82,7 @@ class ProfileMenu extends LitElement {
    *
    * @memberof ProfileMenu
    */
-  _requestSignIn() {
+  _requestSignIn(): void {
     const event = new CustomEvent('sign-in', {
       detail: {
         'sign-in': true,
@@ -108,7 +96,7 @@ class ProfileMenu extends LitElement {
    *
    * @memberof ProfileMenu
    */
-  _requestSignOut() {
+  _requestSignOut(): void {
     const event = new CustomEvent('sign-out', {
       detail: {
         'sign-out': true,
@@ -122,9 +110,9 @@ class ProfileMenu extends LitElement {
    *
    * @memberof ProfileMenu
    */
-  show() {
+  show(): void {
     console.log('show called');
-    const menu = this.shadowRoot.getElementById('menu');
+    const menu = this._menu;
     menu.show();
   }
 
@@ -134,10 +122,8 @@ class ProfileMenu extends LitElement {
    * @param {*} element
    * @memberof ProfileMenu
    */
-  setAnchor(element) {
-    const menu = this.shadowRoot.getElementById('menu');
+  setAnchor(element: HTMLElement): void {
+    const menu = this._menu;
     menu.anchor = element;
   }
 }
-
-customElements.define('profile-menu', ProfileMenu);

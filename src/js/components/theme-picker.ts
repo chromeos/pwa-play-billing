@@ -33,9 +33,9 @@ import './sku-list';
  */
 @customElement('theme-picker')
 export class ThemePicker extends LitElement {
-  @property() themes = [];
-  @property() purchasedTheme = '';
-  @property() _currentSelection = '';
+  @property() themes: Array<string> = [];
+  @property() purchasedTheme: string = '';
+  @property() _currentSelection: string = '';
   
   @query('#theme-select') _themeSelect!: Select;
 

@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-import { LitElement, html } from 'lit';
+import { LitElement, html, HTMLTemplateResult } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 
 import '@material/mwc-button';
@@ -31,9 +31,9 @@ import {Dialog} from '@material/mwc-dialog';
  */
 @customElement('coin-dialog')
 export class CoinDialog extends LitElement {
-  @property() coinSkus = [];
-  @property() service = {};
-  @property() locale = 'en-US';
+  @property() coinSkus: Array<string> = [];
+  @property() service: object = {};
+  @property() locale: string = 'en-US';
 
   @query('#coin-dialog') _coinDialog!: Dialog;
 
@@ -43,7 +43,7 @@ export class CoinDialog extends LitElement {
    * @return {*}
    * @memberof CoinDialog
    */
-  render() {
+  render(): HTMLTemplateResult {
     return html`
       <mwc-dialog id="coin-dialog" heading="Purchase coins">
         <slot name="theme"></slot>
@@ -66,7 +66,7 @@ export class CoinDialog extends LitElement {
    *
    * @memberof CoinDialog
    */
-  firstUpdated() {
+  firstUpdated(): void {
     const dialog = this._coinDialog;
     dialog.addEventListener('closing', () => {
       const e = new CustomEvent('coin-dialog-close', {
@@ -83,7 +83,7 @@ export class CoinDialog extends LitElement {
    *
    * @memberof CoinDialog
    */
-  show() {
+  show():void  {
     console.log('show called');
     const dialog = this._coinDialog;
     dialog.show();
@@ -94,7 +94,7 @@ export class CoinDialog extends LitElement {
    *
    * @memberof CoinDialog
    */
-  close() {
+  close(): void {
     console.log('close called');
     const dialog = this._coinDialog;
     dialog.close();

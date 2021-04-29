@@ -14,9 +14,21 @@
  *  limitations under the License.
  */
 
-import { LitElement, html } from 'lit';
+import { LitElement, html, HTMLTemplateResult } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 
 import '@material/mwc-button';
+
+export interface PurchaseDetails {
+  itemId: string,
+  purchaseType: string,
+  title: string,
+  price: {
+    currency: string,
+    value: string,
+  },
+  description: string,
+}
 
 /**
  * SkuHolder holds a sku and purchasing options for that sku. This is a class that was useful when doing generic testing with the app.
@@ -24,50 +36,26 @@ import '@material/mwc-button';
  * @class SkuHolder
  * @extends {LitElement}
  */
-class SkuHolder extends LitElement {
-  /**
-   *
-   *
-   * @readonly
-   * @static
-   * @memberof SkuHolder
-   */
-  static get properties() {
-    return {
-      details: { type: Object, reflect: true }, // We may just want pass this in directly.
-      price: { type: String },
-      purchase: { type: Function },
-      consume: { type: Function },
-      type: { type: String },
-    };
-  }
-
-  /**
-   * Creates an instance of SkuHolder.
-   * @memberof SkuHolder
-   */
-  constructor() {
-    super();
-    this.details = {
-      itemId: 'testId',
-      purchaseType: 'onetime',
-      title: 'testTitle',
-      price: {
-        currency: 'USD',
-        value: '0.99000',
-      },
-      description: 'Worlds best pizza',
-    };
-    this.price = '$0.99';
-    this.purchase = () => {
-      console.log('Purchase function not set');
-    };
-
-    this.consume = () => {
-      console.log('Consume funcition not set.');
-    };
-    this.type = 'sku';
-  }
+@customElement('sku-holder')
+export class SkuHolder extends LitElement {
+  @property({ type: Object, reflect: true }) details: PurchaseDetails = {
+                                            itemId: 'testId',
+                                            purchaseType: 'onetime',
+                                            title: 'testTitle',
+                                            price: {
+                                              currency: 'USD',
+                                              value: '0.99000',
+                                            },
+                                            description: 'Worlds best pizza',
+                                          };
+  @property({ type: String }) price: string = '$0.99';
+  @property({ type: String }) type: string = 'sku';
+  @property({ type: Function }) consume: Function = () => {
+    console.log('Consume funcition not set.');
+  };
+  @property({ type: Function }) purchase: Function = () => {
+    console.log('Purchase function not set');
+  };
 
   /**
    * hasConsumeBtn validates whether or not this item is a consumable item or not. Then it indicates to the render function whether to render the HTML.
@@ -76,7 +64,7 @@ class SkuHolder extends LitElement {
    * @return {TemplateResult}
    * @memberof SkuHolder
    */
-  hasConsumeBtn(purchaseType) {
+  hasConsumeBtn(purchaseType: string): HTMLTemplateResult {
     if (purchaseType == 'onetime') {
       return html`<mwc-button
         ?disabled="${this.consume === null}"
@@ -94,7 +82,7 @@ class SkuHolder extends LitElement {
    * @return {TemplateResult}
    * @memberof SkuHolder
    */
-  purchaseBtn() {
+  purchaseBtn(): HTMLTemplateResult {
     let purchaseVerb;
     switch (this.type) {
       case 'upgrade':
@@ -120,7 +108,7 @@ class SkuHolder extends LitElement {
    * @return {TemplateResult}
    * @memberof SkuHolder
    */
-  render() {
+  render(): HTMLTemplateResult {
     return html`
       <div id="purchase_box__${this.details.itemId}">
         ${this.type === 'coin'
@@ -135,5 +123,3 @@ class SkuHolder extends LitElement {
     `;
   }
 }
-
-customElements.define('sku-holder', SkuHolder);
