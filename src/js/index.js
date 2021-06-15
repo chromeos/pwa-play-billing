@@ -72,7 +72,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     } else {
       user = null;
       profile.set({});
-      purchases.set({});
+      purchases.set([]);
     }
   });
 
