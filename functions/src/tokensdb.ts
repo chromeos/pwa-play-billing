@@ -58,6 +58,11 @@ export async function addSubscriptionToken(
   if (!userRef) {
     return false;
   }
+  // Check whether that token already exists in the store
+  if (await exists(subPurchase.purchaseToken)) {
+    console.log(`This subcription purchase token is already in the store.`);
+    return false;
+  }
 
   // Check the subscription object for a linkedPurchaseToken field. If there is one,
   // invalidate that token as it has been replaced by this new purchaseToken.

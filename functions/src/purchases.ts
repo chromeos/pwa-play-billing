@@ -248,8 +248,10 @@ export async function setHasSub(
   if (hasSub) {
     // Launch this async call but no need to block on it
     await addSubscriptionToken(userRef, subPurchase)
-      .then(function () {
-        console.log(`Added ${sku} token.`);
+      .then(function (addedNewToken: boolean) {
+        if (addedNewToken) {
+          console.log(`Added new ${sku} token.`);
+        }
       })
       .catch(function (error: any) {
         console.error(`Failed to add ${sku} token.`, error);
