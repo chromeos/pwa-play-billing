@@ -58,9 +58,8 @@ export class PlayBillingService {
    * @return {PurchaseType}
    */
   _getPurchaseType(purchase) {
-    const purchaseType = this.skus.find((sku) => sku.itemId === purchase.itemId)
-      ? purchase.purchaseType
-      : 'onetime';
+    const skuMatch = this.skus.find((sku) => sku.itemId === purchase.itemId);
+    const purchaseType = skuMatch ? skuMatch.purchaseType : 'onetime';
     return purchaseType;
   }
 
@@ -87,15 +86,31 @@ export class PlayBillingService {
 
   /**
    * List existing entitlements that haven't been consumed yet or are on-going subscriptions
-   * @return {PurchaseDetails[]} Also includes the purchase's purchase typ
+   * @return {PurchaseDetails[]} Also includes the purchase's purchase type
    */
   async getPurchases() {
     if (!this.skus) {
       await this.init();
     }
-    const purchases = (await this.service.listPurchases()).map((p) =>
+    let purchases = (await this.service.listPurchases()).map((p) =>
       Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
     );
+
+    // Acknowledge any un-acknowledged purchases.
+    let acknowledged = false;
+    for (const purchase of purchases) {
+      if (purchase.purchaseState == 'purchased' && !purchase.acknowledged) {
+        await this.acknowledge(purchase.purchaseToken, purchase);
+        acknowledged = true;
+      }
+    }
+
+    // Update purchases again after acknowledging un-acknowledged purchases
+    if (acknowledged) {
+      purchases = (await this.service.listPurchases()).map((p) =>
+        Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
+      );
+    }
 
     return Object.freeze(purchases);
   }
