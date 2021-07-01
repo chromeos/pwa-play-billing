@@ -30,7 +30,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chromeos/twa-sample.git"
+    "url": "git+https://github.com/chromeos/pwa-play-billing.git"
   },
   "keywords": [
     "play",
@@ -41,12 +41,12 @@
   "author": "Chrome OS DevRel",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/chromeos/twa-sample/issues"
+    "url": "https://github.com/chromeos/pwa-play-billing/issues"
   },
   "husky": {
     "pre-push": "npm test"
   },
-  "homepage": "https://github.com/chromeos/twa-sample#readme",
+  "homepage": "https://github.com/chromeos/pwa-play-billing#readme",
   "dependencies": {
     "@material/mwc-button": "^0.20.0",
     "@material/mwc-dialog": "^0.20.0",
