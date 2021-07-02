@@ -139,7 +139,20 @@ export class PlayBillingService {
   }
 
   /**
+   * Apps should acknowledge the purchase after confirming that the purchase token
+   * has been associated with a user. This app only acknowledges purchases after
+   * successfully receiving the subscription data back from the server.
    *
+   * Developers can choose to acknowledge purchases from a server using the
+   * Google Play Developer API. The server has direct access to the user database,
+   * so using the Google Play Developer API for acknowledgement might be more reliable.
+   *
+   * If the purchase token is not acknowledged within 3 days,
+   * then Google Play will automatically refund and revoke the purchase.
+   * This behavior helps ensure that users are not charged for subscriptions unless the
+   * user has successfully received access to the content.
+   * This eliminates a category of issues where users complain to developers
+   * that they paid for something that the app is not giving to them.
    * @param {string} token - Purchase token
    * @param {PurchaseDetailsWithType|PlayBillingServiceSku} item - SKU or purchase to acknowledge
    */
