@@ -195,7 +195,7 @@ export class PlayBillingService {
     See https://developer.android.com/google/play/billing/subscriptions#proration-recommendations
     for more information about the different proration modes and recommendations.
     */
-    let prorationMode = null;
+    let prorationMode;
     switch (subType) {
       case 'upgrade':
         prorationMode = 'immediateAndChargeProratedPrice';
