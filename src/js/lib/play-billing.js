@@ -195,10 +195,16 @@ export class PlayBillingService {
     See https://developer.android.com/google/play/billing/subscriptions#proration-recommendations
     for more information about the different proration modes and recommendations.
     */
-    let prorationMode = 'deferred';
-    if (subType === 'upgrade') {
-      prorationMode = 'immediateAndChargeProratedPrice';
+    let prorationMode = null;
+    switch (subType) {
+      case 'upgrade':
+        prorationMode = 'immediateAndChargeProratedPrice';
+        break;
+      case 'downgrade':
+        prorationMode = 'deferred';
+        break;
     }
+
     // Build payment request
     const paymentMethod = [
       {
