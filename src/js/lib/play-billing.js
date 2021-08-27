@@ -220,10 +220,10 @@ export class PlayBillingService {
 
     const payment = new PaymentRequest(paymentMethod);
     const response = await payment.show();
-    const { token } = response.details;
+    const { purchaseToken } = response.details;
 
     // Call backend to validate the purchase
-    const valid = await this.validatePurchaseOnBackend(sku, token);
+    const valid = await this.validatePurchaseOnBackend(sku, purchaseToken);
     if (valid) {
       // Tell PaymentRequest API validation was successful.
       // The user-agent may show a "payment successul" message to the user.
