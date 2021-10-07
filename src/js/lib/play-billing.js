@@ -174,6 +174,9 @@ export class PlayBillingService {
     // Subscriptions need to be acknowledges as 'onetime'
     const type = item.purchaseType === 'subscription' ? 'onetime' : item.purchaseType;
 
+    if (type == 'repeatable') {
+      return await this.consume(token);
+    }
     return await this.service.acknowledge(token, type);
   }
 
@@ -183,7 +186,13 @@ export class PlayBillingService {
    * @param {string} token - Purchase token
    */
   async consume(token) {
-    return await this.acknowledge(token, { purchaseType: 'repeatable' });
+    if ('acknowledge' in this.service) {
+      // DGAPI 1.0
+      return await this.service.acknowledge(token, 'repeatable');
+    } else {
+      // DGAPI 2.0
+      return await this.service.consume(token);
+    }
   }
 
   /**
