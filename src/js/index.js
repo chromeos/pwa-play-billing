@@ -59,6 +59,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
       // Set up an instance of Play Billing Service
       const { PlayBillingService } = await import('./lib/play-billing');
       service = new PlayBillingService(skus);
+      await service.init();
     } catch (e) {
       log(e);
     }
@@ -133,7 +134,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   });
 
   // Check to see if the Digital Goods API is available
-  if (service) {
+  if (service?.isAvailable()) {
     try {
       // Attach the service to skuList
       skuList.service = service;

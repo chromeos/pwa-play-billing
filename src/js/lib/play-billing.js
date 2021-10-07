@@ -32,23 +32,35 @@ export class PlayBillingService {
   constructor(lookups) {
     this.lookups = Object.freeze(lookups);
     this.serviceURL = 'https://play.google.com/billing';
-    this.init();
   }
 
   /**
    * Runs async initialization code
-   * @private
    */
   async init() {
-    // Get service
-    if (!this.service) {
+    try {
+      // Get service
       this.service = Object.freeze(await window.getDigitalGoodsService(this.serviceURL));
+      if (this.service === null) {
+        // DGAPI 1.0
+        // Play Billing is not available.
+      }
+    } catch (error) {
+      // DGAPI 2.0
+      // Play Billing is not available.
+      throw new Error('DGAPI 2.0 Play Billing is not available.');
     }
+  }
 
-    // Get item details
-    if (!this.skus) {
-      await this.updateSkus();
+  /**
+   * Returns whether the DG service for Play Billing is available
+   * @return {boolean}
+   */
+  isAvailable() {
+    if (this.service) {
+      return true;
     }
+    return false;
   }
 
   /**
@@ -90,7 +102,7 @@ export class PlayBillingService {
    */
   async getPurchases() {
     if (!this.skus) {
-      await this.init();
+      await this.updateSkus();
     }
     let purchases = (await this.service.listPurchases()).map((p) =>
       Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
@@ -120,7 +132,9 @@ export class PlayBillingService {
    * @return {PlayBillingServiceSku[]}
    */
   async getSkus() {
-    if (!this.skus) await this.init();
+    if (!this.skus) {
+      await this.updateSkus();
+    }
 
     return this.skus;
   }
@@ -157,10 +171,6 @@ export class PlayBillingService {
    * @param {PurchaseDetailsWithType|PlayBillingServiceSku} item - SKU or purchase to acknowledge
    */
   async acknowledge(token, item) {
-    if (!this.service) {
-      await this.init();
-    }
-
     // Subscriptions need to be acknowledges as 'onetime'
     const type = item.purchaseType === 'subscription' ? 'onetime' : item.purchaseType;
 
@@ -183,7 +193,9 @@ export class PlayBillingService {
    * @param {string} subType - The type of subscription purchase (upgrade, downgrade, or normal purchase)
    */
   async purchase(purchaseSku, oldPurchase, subType) {
-    if (!this.service || !this.skus) await this.init();
+    if (!this.skus) {
+      await this.updateSkus();
+    }
 
     const sku =
       typeof purchaseSku === 'string'
