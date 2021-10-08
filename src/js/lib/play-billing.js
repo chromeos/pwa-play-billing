@@ -174,10 +174,13 @@ export class PlayBillingService {
     // Subscriptions need to be acknowledges as 'onetime'
     const type = item.purchaseType === 'subscription' ? 'onetime' : item.purchaseType;
 
+    // For repeatable purchases, call consume()
     if (type == 'repeatable') {
       return await this.consume(token);
     }
-    return await this.service.acknowledge(token, type);
+
+    // For all other purchases, call backend to acknowledge
+    return await this.acknowledgePurchaseOnBackend(item, token);
   }
 
   /**
@@ -259,7 +262,7 @@ export class PlayBillingService {
   }
 
   /**
-   *
+   * Call the backend to validate purchase
    * @param {PlayBillingServiceSku} sku
    * @param {string} token
    */
@@ -293,6 +296,46 @@ export class PlayBillingService {
       }
     } catch (error) {
       throw new Error(`Failed to verify purchase token: ${error.message}`);
+    }
+  }
+
+  /**
+   * Call the backend to acknowledge purchase
+   * @param {PlayBillingServiceSku} sku
+   * @param {string} token
+   */
+  async acknowledgePurchaseOnBackend(sku, token) {
+    const request = '/api/acknowledgePurchase';
+    let type;
+
+    if (sku.purchaseType === 'subscription') {
+      type = 'subscription';
+    } else {
+      type = 'inapp';
+    }
+
+    try {
+      const response = await (
+        await fetch(request, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sku: sku.itemId,
+            token,
+            type,
+          }),
+        })
+      ).json();
+
+      if (!('error' in response)) {
+        return response.status;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw new Error(`Failed to acknowledge purchase: ${error.message}`);
     }
   }
 }

@@ -22,7 +22,13 @@ admin.initializeApp();
 
 import * as functions from 'firebase-functions';
 import * as purchases from './purchases';
-import { EXAMPLE_SKUS, IN_APP_COIN_COST, VALID_THEME_NAMES } from './skusValue';
+import {
+  EXAMPLE_SKUS,
+  IN_APP_COIN_COST,
+  VALID_THEME_NAMES,
+  INAPP_TYPE,
+  SUB_TYPE,
+} from './skusValue';
 import * as usersdb from './usersdb';
 import * as rtdn from './notifications';
 import * as tokensdb from './tokensdb';
@@ -199,6 +205,56 @@ app.post('/setTheme', async (request: RequestWithUser, response: functions.Respo
   }
 
   response.json({ error: 'error changing theme.' });
+});
+
+app.post('/acknowledgePurchase', async (request: RequestWithUser, response: functions.Response) => {
+  functions.logger.info('Acknowledge purchase request came in', { structuredData: true });
+
+  // Get parameters passed to the request
+  const sku: string = request.body?.sku;
+  const purchaseToken: string = request.body?.token;
+  const purchaseType: string = request.body?.type;
+
+  if (sku === undefined || purchaseToken === undefined || purchaseType === undefined) {
+    console.error(
+      `Either sku (${sku}), purchaseToken (${purchaseToken}), or purchaseType (${purchaseType}) is undefined`,
+    );
+    response.status(400).json({
+      error: `Incorrect propery values sent : Either sku (${sku}), purchaseToken (${purchaseToken}), or purchaseType(${purchaseType}) is undefined`,
+    });
+    return;
+  }
+
+  functions.logger.info(
+    `${purchaseType} sku, ${sku}, with ${purchaseToken} is received to be acknowledged`,
+  );
+
+  // Make sure token is in valid purchase state
+  let purchase;
+  if (purchaseType == INAPP_TYPE) {
+    purchase = await purchases.fetchPurchase(sku, purchaseToken);
+  } else {
+    purchase = await purchases.fetchSubscriptionPurchase(sku, purchaseToken);
+  }
+
+  // If purchase has not been acknowledged, acknowledge it
+  if (purchase && !purchase.wasAcknowledged()) {
+    let purchaseAcknowledged;
+    if (purchaseType == INAPP_TYPE) {
+      purchaseAcknowledged = await purchases.acknowledgeInAppPurchase(sku, purchaseToken);
+    } else if (purchaseType == SUB_TYPE) {
+      purchaseAcknowledged = await purchases.acknowledgeSubPurchase(sku, purchaseToken);
+    }
+
+    if (purchaseAcknowledged) {
+      response.json({ status: 'Purchase acknowledged' });
+      return;
+    }
+    response.json({ error: 'Error acknowledging purchase' });
+    return;
+  }
+
+  response.json({ statue: 'Purchase was already acknowledged' });
 });
 
 app.post('/addCoins', async (request: RequestWithUser, response: functions.Response) => {
