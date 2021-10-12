@@ -86,9 +86,10 @@ export class PlayBillingService {
 
   /**
    * List existing entitlements that haven't been consumed yet or are on-going subscriptions
+   * @param {User} user
    * @return {PurchaseDetails[]} Also includes the purchase's purchase type
    */
-  async getPurchases() {
+  async getPurchases(user) {
     if (!this.skus) {
       await this.init();
     }
@@ -99,7 +100,12 @@ export class PlayBillingService {
     // Acknowledge any un-acknowledged purchases.
     let acknowledged = false;
     for (const purchase of purchases) {
-      if (purchase.purchaseState == 'purchased' && !purchase.acknowledged) {
+      if (
+        purchase.purchaseState == 'purchased' &&
+        (!purchase.acknowledged || purchase.purchaseType === 'repeatable')
+      ) {
+        // grant entitlement first then acknowledge
+        await user.grantEntitlement(purchase, purchase.purchaseToken);
         await this.acknowledge(purchase.purchaseToken, purchase);
         acknowledged = true;
       }

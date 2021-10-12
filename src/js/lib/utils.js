@@ -55,7 +55,7 @@ export async function refreshPurchases(service, user) {
     profile.set(await user.getInfo());
   }
   if (service) {
-    purchases.set((await service.getPurchases()) || []);
+    purchases.set((await service.getPurchases(user)) || []);
   }
 }
 
