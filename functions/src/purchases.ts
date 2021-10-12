@@ -226,6 +226,45 @@ export async function addPhoto(
       });
   }
 }
+
+/**
+ * Remove photo from user's photo entitlements
+ * @param {FirebaseFirestore.DocumentReference} userRef
+ * @param {billing.Purchase} purchase
+ */
+export async function removePhoto(
+  userRef: FirebaseFirestore.DocumentReference,
+  purchase: billing.Purchase,
+): Promise<boolean> {
+  if (!userRef) {
+    return false;
+  }
+
+  const userData = await getUserData(userRef);
+  if (!userData) {
+    return false;
+  }
+
+  const existingPhotos = userData.photoEntitlements;
+  if (existingPhotos.includes(purchase.productId)) {
+    const index = existingPhotos.indexOf(purchase.productId);
+    existingPhotos.splice(index, 1);
+    return userRef
+      .update({
+        photoEntitlements: existingPhotos,
+      })
+      .then(function (): boolean {
+        console.log(`Removed ${purchase.productId} from photo entitlements`);
+        return true;
+      })
+      .catch(function (error: Error): boolean {
+        console.error(`Could not remove ${purchase.productId} from users reference : ${error}`);
+        return false;
+      });
+  }
+  return false;
+}
+
 /**
  * Grant/remove entitlement for the Basic or Premium subscription
  *
