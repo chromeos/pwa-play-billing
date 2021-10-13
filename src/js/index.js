@@ -69,7 +69,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
       // Gets the user's profile and sets the number of coins a user has
       user = new User(await firebase.getApiHeader(), log);
       if (service) {
-        marketSetup();
+        await marketSetup();
       }
     } else {
       user = null;

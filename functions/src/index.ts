@@ -242,7 +242,7 @@ app.post('/addCoins', async (request: RequestWithUser, response: functions.Respo
     return;
   }
 
-  response.json({ error: 'error granting coins entitlement.' });
+  response.status(503).json({ error: 'error granting coins entitlement.' });
 });
 
 app.post('/addPhoto', async (request: RequestWithUser, response: functions.Response) => {
@@ -284,7 +284,7 @@ app.post('/addPhoto', async (request: RequestWithUser, response: functions.Respo
     return;
   }
 
-  response.json({ error: 'error granting photo entitlement.' });
+  response.status(503).json({ error: 'error granting photo entitlement.' });
 });
 
 app.post('/removePhoto', async (request: RequestWithUser, response: functions.Response) => {
@@ -326,7 +326,7 @@ app.post('/removePhoto', async (request: RequestWithUser, response: functions.Re
     return;
   }
 
-  response.json({ error: 'error removing entitlement.' });
+  response.status(503).json({ error: 'error removing entitlement.' });
 });
 
 app.post('/setHasSub', async (request: RequestWithUser, response: functions.Response) => {
