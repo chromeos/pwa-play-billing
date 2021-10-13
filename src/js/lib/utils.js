@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-import { purchases, profile } from './application-store';
+import { profile, purchases } from './application-store';
 /**
  *
  * @param {DOMElement} box - A DOM element to attach the log to.
@@ -50,12 +50,14 @@ export function Notifier(snackbar) {
  * @param {User} user
  */
 export async function refreshPurchases(service, user) {
-  // Get purchases and available items, and attach them to skuList
+  // if (user) {
+  //   profile.set(await user.getInfo());
+  // }
+  if (service && user) {
+    purchases.set((await service.getPurchases(user)) || []);
+  }
   if (user) {
     profile.set(await user.getInfo());
-  }
-  if (service) {
-    purchases.set((await service.getPurchases(user)) || []);
   }
 }
 

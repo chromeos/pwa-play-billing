@@ -100,12 +100,14 @@ export class PlayBillingService {
     // Acknowledge any un-acknowledged purchases.
     let acknowledged = false;
     for (const purchase of purchases) {
+      if (purchase.purchaseType !== 'subscription') {
+        // Grant entitlement for all returned purchases (backend prevents double entitlements)
+        await user.grantEntitlement(purchase, purchase.purchaseToken);
+      }
       if (
         purchase.purchaseState == 'purchased' &&
         (!purchase.acknowledged || purchase.purchaseType === 'repeatable')
       ) {
-        // grant entitlement first then acknowledge
-        await user.grantEntitlement(purchase, purchase.purchaseToken);
         await this.acknowledge(purchase.purchaseToken, purchase);
         acknowledged = true;
       }
