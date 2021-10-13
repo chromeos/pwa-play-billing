@@ -32,6 +32,7 @@ export class PlayBillingService {
   constructor(lookups) {
     this.lookups = Object.freeze(lookups);
     this.serviceURL = 'https://play.google.com/billing';
+    this.skus = [];
     this.init();
   }
 
@@ -46,7 +47,7 @@ export class PlayBillingService {
     }
 
     // Get item details
-    if (!this.skus) {
+    if (this.skus.length == 0) {
       await this.updateSkus();
     }
   }
@@ -90,7 +91,7 @@ export class PlayBillingService {
    * @return {PurchaseDetails[]} Also includes the purchase's purchase type
    */
   async getPurchases(user) {
-    if (!this.skus) {
+    if (this.skus.length == 0) {
       await this.init();
     }
     let purchases = (await this.service.listPurchases()).map((p) =>
@@ -125,10 +126,10 @@ export class PlayBillingService {
 
   /**
    * List available SKUs
-   * @return {PlayBillingServiceSku[]}
+   * @return {Promise<PlayBillingServiceSku[]>}
    */
   async getSkus() {
-    if (!this.skus) await this.init();
+    if (this.skus.length == 0) await this.init();
 
     return this.skus;
   }
@@ -191,7 +192,7 @@ export class PlayBillingService {
    * @param {string} subType - The type of subscription purchase (upgrade, downgrade, or normal purchase)
    */
   async purchase(purchaseSku, oldPurchase, subType) {
-    if (!this.service || !this.skus) await this.init();
+    if (!this.service || this.skus.length == 0) await this.init();
 
     const sku =
       typeof purchaseSku === 'string'

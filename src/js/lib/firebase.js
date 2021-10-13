@@ -41,16 +41,14 @@ export class Firebase {
     this.firebase = firebase;
     this.provider = new firebase.auth.GoogleAuthProvider();
 
-    this.bearer = new Headers();
+    this.bearer = null;
 
     // TODO: Update user in state management so other things that rely on the user being authenticated can be properly activated
-    this.firebase.auth().onAuthStateChanged(async (user) => {
+    this.firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.log(user.email);
         this.log(user.photoURL);
         this.log(user.displayName);
-        this.bearer.append('Authorization', `Bearer ${await user.getIdToken(false)}`);
-        this.bearer.append('Content-Type', 'application/json');
         authenticated.set(true);
         this.appBar.setAttribute('photourl', user.photoURL);
       } else {
@@ -95,6 +93,12 @@ export class Firebase {
    * ID token is JSON Web Token (JWT) used to identify the user to a Firebase service.
    */
   async getApiHeader() {
+    const user = this.firebase.auth().currentUser;
+    if (user && !this.bearer) {
+      this.bearer = new Headers();
+      this.bearer.append('Authorization', `Bearer ${await user.getIdToken(false)}`);
+      this.bearer.append('Content-Type', 'application/json');
+    }
     return this.bearer;
   }
 }

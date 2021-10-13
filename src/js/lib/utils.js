@@ -50,9 +50,6 @@ export function Notifier(snackbar) {
  * @param {User} user
  */
 export async function refreshPurchases(service, user) {
-  // if (user) {
-  //   profile.set(await user.getInfo());
-  // }
   if (service && user) {
     purchases.set((await service.getPurchases(user)) || []);
   }
