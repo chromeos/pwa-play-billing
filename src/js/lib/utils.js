@@ -54,7 +54,7 @@ export async function refreshPurchases(service, user) {
   if (user) {
     profile.set(await user.getInfo());
   }
-  if (service?.isAvailable()) {
+  if (await service.isAvailable()) {
     purchases.set((await service.getPurchases()) || []);
   }
 }

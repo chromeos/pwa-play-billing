@@ -32,35 +32,45 @@ export class PlayBillingService {
   constructor(lookups) {
     this.lookups = Object.freeze(lookups);
     this.serviceURL = 'https://play.google.com/billing';
+    this.service = null;
+    this._init();
   }
 
   /**
    * Runs async initialization code
+   * @private
    */
-  async init() {
+  async _init() {
+    if (!('getDigitalGoodsService' in window)) {
+      this.service = false;
+      return;
+    }
     try {
-      // Get service
-      this.service = Object.freeze(await window.getDigitalGoodsService(this.serviceURL));
       if (this.service === null) {
+        // Get Play Billing service
+        this.service = Object.freeze(await window.getDigitalGoodsService(this.serviceURL)) || false;
+      }
+      if (this.service === false) {
         // DGAPI 1.0
         // Play Billing is not available.
       }
     } catch (error) {
       // DGAPI 2.0
       // Play Billing is not available.
-      throw new Error('DGAPI 2.0 Play Billing is not available.');
+      this.service = false;
     }
   }
 
   /**
    * Returns whether the DG service for Play Billing is available
-   * @return {boolean}
+   * @return {Promise<boolean>}
    */
-  isAvailable() {
-    if (this.service) {
-      return true;
+  async isAvailable() {
+    if (this.service === null) {
+      await this._init();
     }
-    return false;
+
+    return this.service !== false;
   }
 
   /**
@@ -81,6 +91,10 @@ export class PlayBillingService {
    * @param {PlayBillingLookupItem[]} lookups - Array of lookup items (itemId, purchaseType)
    */
   async updateSkus(lookups) {
+    if (!(await this.isAvailable())) {
+      throw new Error('DGAPI Play Billing is not available.');
+    }
+
     if (lookups) {
       this.lookups = Object.freeze(lookups);
     }
@@ -101,9 +115,14 @@ export class PlayBillingService {
    * @return {PurchaseDetails[]} Also includes the purchase's purchase type
    */
   async getPurchases() {
+    if (!(await this.isAvailable())) {
+      throw new Error('DGAPI Play Billing is not available.');
+    }
+
     if (!this.skus) {
       await this.updateSkus();
     }
+
     let purchases = (await this.service.listPurchases()).map((p) =>
       Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
     );
@@ -129,7 +148,7 @@ export class PlayBillingService {
 
   /**
    * List available SKUs
-   * @return {PlayBillingServiceSku[]}
+   * @return {Promise<PlayBillingServiceSku[]>}
    */
   async getSkus() {
     if (!this.skus) {
@@ -189,6 +208,10 @@ export class PlayBillingService {
    * @param {string} token - Purchase token
    */
   async consume(token) {
+    if (!(await this.isAvailable())) {
+      throw new Error('DGAPI Play Billing is not available.');
+    }
+
     if ('acknowledge' in this.service) {
       // DGAPI 1.0
       return await this.service.acknowledge(token, 'repeatable');
@@ -205,14 +228,9 @@ export class PlayBillingService {
    * @param {string} subType - The type of subscription purchase (upgrade, downgrade, or normal purchase)
    */
   async purchase(purchaseSku, oldPurchase, subType) {
-    if (!this.skus) {
-      await this.updateSkus();
-    }
-
+    const skus = await this.getSkus();
     const sku =
-      typeof purchaseSku === 'string'
-        ? this.skus.find((s) => s.itemId === purchaseSku)
-        : purchaseSku;
+      typeof purchaseSku === 'string' ? skus.find((s) => s.itemId === purchaseSku) : purchaseSku;
 
     /* 
     Set appropriate proration mode based on scenario. 
@@ -306,13 +324,7 @@ export class PlayBillingService {
    */
   async acknowledgePurchaseOnBackend(sku, token) {
     const request = '/api/acknowledgePurchase';
-    let type;
-
-    if (sku.purchaseType === 'subscription') {
-      type = 'subscription';
-    } else {
-      type = 'inapp';
-    }
+    const type = sku.purchaseType === 'subscription' ? 'subscription' : 'inapp';
 
     try {
       const response = await (

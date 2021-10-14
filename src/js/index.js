@@ -42,27 +42,22 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   const firebase = new Firebase(appBar, log);
 
   let user = null;
-
   let service = null;
 
-  // Check to see if the Digital Goods API is available
-  if ('getDigitalGoodsService' in window) {
-    // Get SKUs from back-end
-    try {
-      let { skus } = await (await fetch('/api/getSkus')).json();
-      // Convert to PlayBillingSkuConfig style for Play Billing Service class
-      skus = skus.map((sku) => ({
-        itemId: sku.sku,
-        purchaseType: sku.type,
-      }));
+  // Get SKUs from back-end
+  try {
+    let { skus } = await (await fetch('/api/getSkus')).json();
+    // Convert to PlayBillingSkuConfig style for Play Billing Service class
+    skus = skus.map((sku) => ({
+      itemId: sku.sku,
+      purchaseType: sku.type,
+    }));
 
-      // Set up an instance of Play Billing Service
-      const { PlayBillingService } = await import('./lib/play-billing');
-      service = new PlayBillingService(skus);
-      await service.init();
-    } catch (e) {
-      log(e);
-    }
+    // Set up an instance of Play Billing Service
+    const { PlayBillingService } = await import('./lib/play-billing');
+    service = new PlayBillingService(skus);
+  } catch (e) {
+    log(e);
   }
 
   authenticated.subscribe(async (auth) => {
@@ -134,7 +129,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   });
 
   // Check to see if the Digital Goods API is available
-  if (service?.isAvailable()) {
+  if (await service.isAvailable()) {
     try {
       // Attach the service to skuList
       skuList.service = service;
