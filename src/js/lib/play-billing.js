@@ -111,10 +111,13 @@ export class PlayBillingService {
   }
 
   /**
-   * List existing entitlements that haven't been consumed yet or are on-going subscriptions
+   * List existing entitlements that haven't been consumed yet or are on-going subscriptions.
+   * Also, check with the backend server that user has been granted the entitlement
+   * and that purchases are acknowledged.
+   * @param {User} user
    * @return {PurchaseDetails[]} Also includes the purchase's purchase type
    */
-  async getPurchases() {
+  async getPurchases(user) {
     if (!(await this.isAvailable())) {
       throw new Error('DGAPI Play Billing is not available.');
     }
@@ -127,21 +130,19 @@ export class PlayBillingService {
       Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
     );
 
-    // Acknowledge any un-acknowledged purchases.
-    let acknowledged = false;
     for (const purchase of purchases) {
-      if (purchase.purchaseState == 'purchased' && !purchase.acknowledged) {
-        await this.acknowledge(purchase.purchaseToken, purchase);
-        acknowledged = true;
+      // Grant entitlement for all returned purchases (backend prevents double entitlements)
+      await user.grantEntitlementAndAcknowledge(purchase, purchase.purchaseToken);
+      // For any repeatable purchases, here we should consume them
+      if (purchase.purchaseType === 'repeatable') {
+        await this.consume(purchase.purchaseToken);
       }
     }
 
-    // Update purchases again after acknowledging un-acknowledged purchases
-    if (acknowledged) {
-      purchases = (await this.service.listPurchases()).map((p) =>
-        Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
-      );
-    }
+    // Update purchases again after backend request response is received
+    purchases = (await this.service.listPurchases()).map((p) =>
+      Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
+    );
 
     return Object.freeze(purchases);
   }
@@ -169,37 +170,6 @@ export class PlayBillingService {
       style: 'currency',
       currency: sku.price.currency,
     }).format(Number(sku.price.value));
-  }
-
-  /**
-   * Apps should acknowledge the purchase after confirming that the purchase token
-   * has been associated with a user. This app only acknowledges purchases after
-   * successfully receiving the subscription data back from the server.
-   *
-   * Developers can choose to acknowledge purchases from a server using the
-   * Google Play Developer API. The server has direct access to the user database,
-   * so using the Google Play Developer API for acknowledgement might be more reliable.
-   *
-   * If the purchase token is not acknowledged within 3 days,
-   * then Google Play will automatically refund and revoke the purchase.
-   * This behavior helps ensure that users are not charged for subscriptions unless the
-   * user has successfully received access to the content.
-   * This eliminates a category of issues where users complain to developers
-   * that they paid for something that the app is not giving to them.
-   * @param {string} token - Purchase token
-   * @param {PurchaseDetailsWithType|PlayBillingServiceSku} item - SKU or purchase to acknowledge
-   */
-  async acknowledge(token, item) {
-    // Subscriptions need to be acknowledges as 'onetime'
-    const type = item.purchaseType === 'subscription' ? 'onetime' : item.purchaseType;
-
-    // For repeatable purchases, call consume()
-    if (type == 'repeatable') {
-      return await this.consume(token);
-    }
-
-    // For all other purchases, call backend to acknowledge
-    return await this.acknowledgePurchaseOnBackend(item, token);
   }
 
   /**
@@ -314,40 +284,6 @@ export class PlayBillingService {
       }
     } catch (error) {
       throw new Error(`Failed to verify purchase token: ${error.message}`);
-    }
-  }
-
-  /**
-   * Call the backend to acknowledge purchase
-   * @param {PlayBillingServiceSku} sku
-   * @param {string} token
-   */
-  async acknowledgePurchaseOnBackend(sku, token) {
-    const request = '/api/acknowledgePurchase';
-    const type = sku.purchaseType === 'subscription' ? 'subscription' : 'inapp';
-
-    try {
-      const response = await (
-        await fetch(request, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            sku: sku.itemId,
-            token,
-            type,
-          }),
-        })
-      ).json();
-
-      if (!('error' in response)) {
-        return response.status;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      throw new Error(`Failed to acknowledge purchase: ${error.message}`);
     }
   }
 }

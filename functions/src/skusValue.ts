@@ -47,10 +47,6 @@ export const VALID_THEME_NAMES: string[] = [
 
 export const SKU_BASIC_SUB = 'basic_sub';
 export const SKU_PREMIUM_SUB = 'premium_sub';
-
-export const INAPP_TYPE = 'inapp';
-export const SUB_TYPE = 'subscription';
-
 interface SkuDB {
   sku: string;
   type: string;

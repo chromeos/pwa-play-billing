@@ -59,7 +59,7 @@ export async function acknowledgeInAppPurchase(
         token: purchaseToken,
       })
     )?.data;
-    if (JSON.stringify(apiResponse) === '') {
+    if (JSON.stringify(apiResponse) === `""`) {
       return true;
     }
     return false;
@@ -84,7 +84,7 @@ export async function acknowledgeSubPurchase(
       subscriptionId: sku,
       token: purchaseToken,
     });
-    if (JSON.stringify(apiResponse) === '') {
+    if (JSON.stringify(apiResponse) === `""`) {
       return true;
     }
     return false;
@@ -255,7 +255,7 @@ export async function addPhoto(
   const existingPhotos = userData.photoEntitlements;
   if (existingPhotos.includes(purchase.productId)) {
     console.error(`User already owns photo ${purchase.productId}`);
-    return false;
+    return true;
   } else {
     // Add the purchase to the token store.
     const tokenAdded = await addPurchaseToken(userRef, purchase);

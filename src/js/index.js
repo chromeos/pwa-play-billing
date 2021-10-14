@@ -149,15 +149,15 @@ window.addEventListener('DOMContentLoaded', async (event) => {
           log(`Sku ${e.detail.sku.itemId} was purchased`);
           const sku = e.detail.sku;
           const token = e.detail.response.details.token;
-          await user.grantEntitlement(sku, token);
+          await user.grantEntitlementAndAcknowledge(sku, token);
           /*
-           * Note that for the purposes of this sample to use Digital Goods API,
-           * purchases are acknowledged in the client app but we recommend acknowledging
-           * purchases in your backend server via the Google Play Developer API,
-           * to be more secure. In this sample app, we only acknowledge purchases
-           * after successfully validating the purchasetoken and purchase state in our server.
+           * Note that we have moved purchase acknolwedgement to the backend
+           * server via the Google Play Developer API to be more secure.
+           * Granting entitlements and acknowledging the purchase now
+           * happen in the same call on the backend.
+           *
+           * Please see functions/src/index.ts for the implementation.
            */
-          await service.acknowledge(token, sku);
           // Refreshes the profiles entitlements and the purchased items.
           await refreshPurchases(service, user);
           notify(`${sku.title} Purchased!`);
