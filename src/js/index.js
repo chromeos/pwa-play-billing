@@ -147,14 +147,17 @@ window.addEventListener('DOMContentLoaded', async (event) => {
         await refreshPurchases(service, user);
 
         document.addEventListener('sku-consume', async (e) => {
-          log(`Sku ${e.detail.purchase.itemId} was consumed`);
+          const purchase = e.detail.purchase;
+          log(`Sku ${purchase.itemId} was consumed`);
+          await user.removeEntitlement(purchase);
           await refreshPurchases(service, user);
+          notify(`${purchase.itemId} Consumed!`);
         });
 
         document.addEventListener('sku-purchase', async (e) => {
           if (e.detail.valid) {
-            log(`Sku ${e.detail.sku.itemId} was purchased`);
             const sku = e.detail.sku;
+            log(`Sku ${sku.itemId} was purchased`);
             const token = e.detail.response.details.token;
             await user.grantEntitlementAndAcknowledge(sku, token);
             /*
@@ -165,6 +168,10 @@ window.addEventListener('DOMContentLoaded', async (event) => {
              *
              * Please see functions/src/index.ts for the implementation.
              */
+            // If purchase is repeatable, consume it immediately
+            if (service.getPurchaseType(sku) === 'repeatable') {
+              await service.consume(token);
+            }
             // Refreshes the profiles entitlements and the purchased items.
             await refreshPurchases(service, user);
             notify(`${sku.title} Purchased!`);

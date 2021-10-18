@@ -303,7 +303,7 @@ app.post('/addPhoto', async (request: RequestWithUser, response: functions.Respo
     response.json({ error: 'Error acknowledging purchase' });
     return;
   }
-  
+
   response.json({ status: 'Purchase was already acknowledged' });
 });
 
