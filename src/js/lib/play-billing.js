@@ -32,6 +32,7 @@ export class PlayBillingService {
   constructor(lookups) {
     this.lookups = Object.freeze(lookups);
     this.serviceURL = 'https://play.google.com/billing';
+    this.skus = [];
     this.service = null;
     this._init();
   }
@@ -75,11 +76,10 @@ export class PlayBillingService {
 
   /**
    * Returns the purchase type for the provided purchase
-   * @private
    * @param {PurchaseDetails} purchase - Purchase to check type for
    * @return {PurchaseType}
    */
-  _getPurchaseType(purchase) {
+  getPurchaseType(purchase) {
     const skuMatch = this.skus.find((sku) => sku.itemId === purchase.itemId);
     const purchaseType = skuMatch ? skuMatch.purchaseType : 'onetime';
     return purchaseType;
@@ -122,12 +122,12 @@ export class PlayBillingService {
       throw new Error('DGAPI Play Billing is not available.');
     }
 
-    if (!this.skus) {
+    if (this.skus.length == 0) {
       await this.updateSkus();
     }
 
     let purchases = (await this.service.listPurchases()).map((p) =>
-      Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
+      Object.assign(p, { purchaseType: this.getPurchaseType(p) }),
     );
 
     for (const purchase of purchases) {
@@ -141,7 +141,7 @@ export class PlayBillingService {
 
     // Update purchases again after backend request response is received
     purchases = (await this.service.listPurchases()).map((p) =>
-      Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
+      Object.assign(p, { purchaseType: this.getPurchaseType(p) }),
     );
 
     return Object.freeze(purchases);
@@ -152,7 +152,7 @@ export class PlayBillingService {
    * @return {Promise<PlayBillingServiceSku[]>}
    */
   async getSkus() {
-    if (!this.skus) {
+    if (this.skus.length == 0) {
       await this.updateSkus();
     }
 

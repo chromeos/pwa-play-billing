@@ -90,6 +90,32 @@ export class User {
   }
 
   /**
+   * Send request to remove entitlement for onetime purchase attached to the user in the backend.
+   * @param {PurchaseDetailsWithType} purchase - purchase to remove entitlement for
+   */
+  async removeEntitlement(purchase) {
+    const request = '/api/removePhoto';
+
+    try {
+      const response = await (
+        await fetch(request, {
+          method: 'POST',
+          headers: this.auth,
+          body: JSON.stringify({
+            sku: purchase.itemId,
+            token: purchase.purchaseToken,
+          }),
+        })
+      ).json();
+      this.log(JSON.stringify(response));
+      // TODO: check for error in response
+    } catch (error) {
+      this.log('Failed to remove entitlement');
+      this.log(error.message);
+    }
+  }
+
+  /**
    *
    * @param {string} color - Color to set the theme
    */

@@ -238,7 +238,7 @@ app.post('/addCoins', async (request: RequestWithUser, response: functions.Respo
   // Add the items to the user account
   const addedCoins = await purchases.addCoins(authenticatedUserRef, purchase);
   if (!addedCoins) {
-    response.json({ error: 'error granting entitlement.' });
+    response.status(503).json({ error: 'error granting coins entitlement.' });
     return;
   }
   // If purchase has not been acknowledged, acknowledge it
@@ -283,14 +283,14 @@ app.post('/addPhoto', async (request: RequestWithUser, response: functions.Respo
   const purchase = await purchases.fetchPurchase(sku, purchaseToken);
   if (!purchase || !purchase.wasPurchased()) {
     console.error('Cannot determine if purchase is valid');
-    response.status(503).json({ error: 'Error adding coins. Purchase not verified' });
+    response.status(503).json({ error: 'Error adding photo. Purchase not verified' });
     return;
   }
 
   // Add photo user account's photo entitlements
   const addedPhoto = await purchases.addPhoto(authenticatedUserRef, purchase);
   if (!addedPhoto) {
-    response.json({ error: 'error granting entitlement.' });
+    response.status(503).json({ error: 'error granting photo entitlement.' });
     return;
   }
   // If purchase has not been acknowledged, acknowledge it
@@ -305,6 +305,48 @@ app.post('/addPhoto', async (request: RequestWithUser, response: functions.Respo
   }
 
   response.json({ status: 'Purchase was already acknowledged' });
+});
+
+app.post('/removePhoto', async (request: RequestWithUser, response: functions.Response) => {
+  functions.logger.info('Remove photo request came in', { structuredData: true });
+  usersdb.verifyAuth(request);
+  const authenticatedUserRef = await usersdb.authenticateUser(request);
+
+  if (!authenticatedUserRef) {
+    response.status(403).send({
+      error: 'user is not found in database',
+    });
+    return;
+  }
+
+  // Get parameters passed to the request
+  const sku: string = request.body?.sku;
+  const purchaseToken: string = request.body?.token;
+
+  if (sku === undefined || purchaseToken === undefined) {
+    console.error(`Either sku (${sku}) or purchaseToken (${purchaseToken}) is undefined`);
+    response.status(400).json({
+      error: `Incorrect propery values sent : Either sku (${sku}) or purchaseToken (${purchaseToken}) is undefined`,
+    });
+    return;
+  }
+
+  // Make sure token is in valid purchase state
+  const purchase = await purchases.fetchPurchase(sku, purchaseToken);
+  if (!purchase || !purchase.wasPurchased()) {
+    console.error('Cannot determine if purchase is valid');
+    response.status(503).json({ error: 'Error removing photo. Purchase not verified' });
+    return;
+  }
+
+  // Remove user account's photo entitlements
+  const removedPhoto = await purchases.removePhoto(authenticatedUserRef, purchase);
+  if (removedPhoto) {
+    response.json({ status: 'Photo removed.' });
+    return;
+  }
+
+  response.status(503).json({ error: 'error removing entitlement.' });
 });
 
 app.post('/setHasSub', async (request: RequestWithUser, response: functions.Response) => {
