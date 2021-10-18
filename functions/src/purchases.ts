@@ -42,6 +42,59 @@ interface ChangeResult {
 }
 
 /**
+ *  Acknowledge an in-app item purchase with Play Developer API.
+ *
+ * @param {string} sku is the sku that is attempting to be validated
+ * @param {string} purchaseToken is the token that was provided with this sku to be validated.
+ */
+export async function acknowledgeInAppPurchase(
+  sku: string,
+  purchaseToken: string,
+): Promise<boolean | null> {
+  try {
+    const apiResponse = (
+      await playApi.purchases.products.acknowledge({
+        packageName: myconfig.packageName,
+        productId: sku,
+        token: purchaseToken,
+      })
+    )?.data;
+    if (JSON.stringify(apiResponse) === `""`) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error(`Error acknowledging in-app purchase : ${error}`);
+    return null;
+  }
+}
+
+/**
+ * Acknowledge a subscription purchase with  Play Developer API.
+ * @param {string} sku
+ * @param {string} purchaseToken
+ */
+export async function acknowledgeSubPurchase(
+  sku: string,
+  purchaseToken: string,
+): Promise<boolean | null> {
+  try {
+    const apiResponse = await playApi.purchases.subscriptions.acknowledge({
+      packageName: myconfig.packageName,
+      subscriptionId: sku,
+      token: purchaseToken,
+    });
+    if (JSON.stringify(apiResponse) === `""`) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error(`Error acknowledging subscription purchase : ${error}`);
+    return null;
+  }
+}
+
+/**
  *  Fetch a purchase from the Play Developer API and validate that it has not been consumed already.
  *
  * @param {string} sku is the sku that is attempting to be validated
@@ -202,7 +255,7 @@ export async function addPhoto(
   const existingPhotos = userData.photoEntitlements;
   if (existingPhotos.includes(purchase.productId)) {
     console.error(`User already owns photo ${purchase.productId}`);
-    return false;
+    return true;
   } else {
     // Add the purchase to the token store.
     const tokenAdded = await addPurchaseToken(userRef, purchase);

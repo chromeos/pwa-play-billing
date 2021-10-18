@@ -96,6 +96,7 @@ export class Purchase {
   wasPurchased(): boolean {
     return this.purchaseState === PurchaseState.PAYMENT_PURCHASED;
   }
+
   /**
    * wasConsumed specifies whether the purchase was consumed.
    *
@@ -104,6 +105,16 @@ export class Purchase {
    */
   wasConsumed(): boolean {
     return this.consumptionState;
+  }
+
+  /**
+   * wasAcknowledged specifies whether the purchase was acknowledged.
+   *
+   * @memberof Purchase
+   * @return {boolean}
+   */
+  wasAcknowledged(): boolean {
+    return this.acknowledgementState;
   }
 
   /**

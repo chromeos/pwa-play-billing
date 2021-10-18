@@ -42,26 +42,22 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   const firebase = new Firebase(appBar, log);
 
   let user = null;
-
   let service = null;
 
-  // Check to see if the Digital Goods API is available
-  if ('getDigitalGoodsService' in window) {
-    // Get SKUs from back-end
-    try {
-      let { skus } = await (await fetch('/api/getSkus')).json();
-      // Convert to PlayBillingSkuConfig style for Play Billing Service class
-      skus = skus.map((sku) => ({
-        itemId: sku.sku,
-        purchaseType: sku.type,
-      }));
+  // Get SKUs from back-end
+  try {
+    let { skus } = await (await fetch('/api/getSkus')).json();
+    // Convert to PlayBillingSkuConfig style for Play Billing Service class
+    skus = skus.map((sku) => ({
+      itemId: sku.sku,
+      purchaseType: sku.type,
+    }));
 
-      // Set up an instance of Play Billing Service
-      const { PlayBillingService } = await import('./lib/play-billing');
-      service = new PlayBillingService(skus);
-    } catch (e) {
-      log(e);
-    }
+    // Set up an instance of Play Billing Service
+    const { PlayBillingService } = await import('./lib/play-billing');
+    service = new PlayBillingService(skus);
+  } catch (e) {
+    log(e);
   }
 
   authenticated.subscribe(async (auth) => {
@@ -140,37 +136,35 @@ window.addEventListener('DOMContentLoaded', async (event) => {
    */
   async function marketSetup() {
     // Check to see if the Digital Goods API is available
-    if (service) {
+    if (await service.isAvailable()) {
       try {
         // Attach the service to skuList
         skuList.service = service;
         coinDialog.service = service;
 
         availableItems.set((await service.getSkus()) || []);
+
         await refreshPurchases(service, user);
 
         document.addEventListener('sku-consume', async (e) => {
-          const purchase = e.detail.purchase;
-          log(`Sku ${purchase.itemId} was consumed`);
-          await user.removeEntitlement(purchase);
+          log(`Sku ${e.detail.purchase.itemId} was consumed`);
           await refreshPurchases(service, user);
-          notify(`${purchase.itemId} Consumed!`);
         });
 
         document.addEventListener('sku-purchase', async (e) => {
           if (e.detail.valid) {
+            log(`Sku ${e.detail.sku.itemId} was purchased`);
             const sku = e.detail.sku;
-            log(`Sku ${sku.itemId} was purchased`);
             const token = e.detail.response.details.token;
-            await user.grantEntitlement(sku, token);
+            await user.grantEntitlementAndAcknowledge(sku, token);
             /*
-             * Note that for the purposes of this sample to use Digital Goods API,
-             * purchases are acknowledged in the client app but we recommend acknowledging
-             * purchases in your backend server via the Google Play Developer API,
-             * to be more secure. In this sample app, we only acknowledge purchases
-             * after successfully validating the purchasetoken and purchase state in our server.
+             * Note that we have moved purchase acknolwedgement to the backend
+             * server via the Google Play Developer API to be more secure.
+             * Granting entitlements and acknowledging the purchase now
+             * happen in the same call on the backend.
+             *
+             * Please see functions/src/index.ts for the implementation.
              */
-            await service.acknowledge(token, sku);
             // Refreshes the profiles entitlements and the purchased items.
             await refreshPurchases(service, user);
             notify(`${sku.title} Purchased!`);

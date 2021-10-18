@@ -47,7 +47,6 @@ export const VALID_THEME_NAMES: string[] = [
 
 export const SKU_BASIC_SUB = 'basic_sub';
 export const SKU_PREMIUM_SUB = 'premium_sub';
-
 interface SkuDB {
   sku: string;
   type: string;

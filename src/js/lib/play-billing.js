@@ -33,23 +33,45 @@ export class PlayBillingService {
     this.lookups = Object.freeze(lookups);
     this.serviceURL = 'https://play.google.com/billing';
     this.skus = [];
-    this.init();
+    this.service = null;
+    this._init();
   }
 
   /**
    * Runs async initialization code
    * @private
    */
-  async init() {
-    // Get service
-    if (!this.service) {
-      this.service = Object.freeze(await window.getDigitalGoodsService(this.serviceURL));
+  async _init() {
+    if (!('getDigitalGoodsService' in window)) {
+      this.service = false;
+      return;
+    }
+    try {
+      if (this.service === null) {
+        // Get Play Billing service
+        this.service = Object.freeze(await window.getDigitalGoodsService(this.serviceURL)) || false;
+      }
+      if (this.service === false) {
+        // DGAPI 1.0
+        // Play Billing is not available.
+      }
+    } catch (error) {
+      // DGAPI 2.0
+      // Play Billing is not available.
+      this.service = false;
+    }
+  }
+
+  /**
+   * Returns whether the DG service for Play Billing is available
+   * @return {Promise<boolean>}
+   */
+  async isAvailable() {
+    if (this.service === null) {
+      await this._init();
     }
 
-    // Get item details
-    if (this.skus.length == 0) {
-      await this.updateSkus();
-    }
+    return this.service !== false;
   }
 
   /**
@@ -70,6 +92,10 @@ export class PlayBillingService {
    * @param {PlayBillingLookupItem[]} lookups - Array of lookup items (itemId, purchaseType)
    */
   async updateSkus(lookups) {
+    if (!(await this.isAvailable())) {
+      throw new Error('DGAPI Play Billing is not available.');
+    }
+
     if (lookups) {
       this.lookups = Object.freeze(lookups);
     }
@@ -86,40 +112,38 @@ export class PlayBillingService {
   }
 
   /**
-   * List existing entitlements that haven't been consumed yet or are on-going subscriptions
+   * List existing entitlements that haven't been consumed yet or are on-going subscriptions.
+   * Also, check with the backend server that user has been granted the entitlement
+   * and that purchases are acknowledged.
    * @param {User} user
    * @return {PurchaseDetails[]} Also includes the purchase's purchase type
    */
   async getPurchases(user) {
-    if (this.skus.length == 0) {
-      await this.init();
+    if (!(await this.isAvailable())) {
+      throw new Error('DGAPI Play Billing is not available.');
     }
+
+    if (this.skus.length == 0) {
+      await this.updateSkus();
+    }
+
     let purchases = (await this.service.listPurchases()).map((p) =>
       Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
     );
 
-    // Acknowledge any un-acknowledged purchases.
-    let acknowledged = false;
     for (const purchase of purchases) {
-      if (purchase.purchaseType !== 'subscription') {
-        // Grant entitlement for all returned purchases (backend prevents double entitlements)
-        await user.grantEntitlement(purchase, purchase.purchaseToken);
-      }
-      if (
-        purchase.purchaseState == 'purchased' &&
-        (!purchase.acknowledged || purchase.purchaseType === 'repeatable')
-      ) {
-        await this.acknowledge(purchase.purchaseToken, purchase);
-        acknowledged = true;
+      // Grant entitlement for all returned purchases (backend prevents double entitlements)
+      await user.grantEntitlementAndAcknowledge(purchase, purchase.purchaseToken);
+      // For any repeatable purchases, here we should consume them
+      if (purchase.purchaseType === 'repeatable') {
+        await this.consume(purchase.purchaseToken);
       }
     }
 
-    // Update purchases again after acknowledging un-acknowledged purchases
-    if (acknowledged) {
-      purchases = (await this.service.listPurchases()).map((p) =>
-        Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
-      );
-    }
+    // Update purchases again after backend request response is received
+    purchases = (await this.service.listPurchases()).map((p) =>
+      Object.assign(p, { purchaseType: this._getPurchaseType(p) }),
+    );
 
     return Object.freeze(purchases);
   }
@@ -129,7 +153,9 @@ export class PlayBillingService {
    * @return {Promise<PlayBillingServiceSku[]>}
    */
   async getSkus() {
-    if (this.skus.length == 0) await this.init();
+    if (this.skus.length == 0) {
+      await this.updateSkus();
+    }
 
     return this.skus;
   }
@@ -148,41 +174,22 @@ export class PlayBillingService {
   }
 
   /**
-   * Apps should acknowledge the purchase after confirming that the purchase token
-   * has been associated with a user. This app only acknowledges purchases after
-   * successfully receiving the subscription data back from the server.
-   *
-   * Developers can choose to acknowledge purchases from a server using the
-   * Google Play Developer API. The server has direct access to the user database,
-   * so using the Google Play Developer API for acknowledgement might be more reliable.
-   *
-   * If the purchase token is not acknowledged within 3 days,
-   * then Google Play will automatically refund and revoke the purchase.
-   * This behavior helps ensure that users are not charged for subscriptions unless the
-   * user has successfully received access to the content.
-   * This eliminates a category of issues where users complain to developers
-   * that they paid for something that the app is not giving to them.
-   * @param {string} token - Purchase token
-   * @param {PurchaseDetailsWithType|PlayBillingServiceSku} item - SKU or purchase to acknowledge
-   */
-  async acknowledge(token, item) {
-    if (!this.service) {
-      await this.init();
-    }
-
-    // Subscriptions need to be acknowledges as 'onetime'
-    const type = item.purchaseType === 'subscription' ? 'onetime' : item.purchaseType;
-
-    return await this.service.acknowledge(token, type);
-  }
-
-  /**
    * Forces a purchase token to be consumed.
    * Purchases are coerced into a 'repeatable' type as that's the only type that will trigger consumption in Play
    * @param {string} token - Purchase token
    */
   async consume(token) {
-    return await this.acknowledge(token, { purchaseType: 'repeatable' });
+    if (!(await this.isAvailable())) {
+      throw new Error('DGAPI Play Billing is not available.');
+    }
+
+    if ('acknowledge' in this.service) {
+      // DGAPI 1.0
+      return await this.service.acknowledge(token, 'repeatable');
+    } else {
+      // DGAPI 2.0
+      return await this.service.consume(token);
+    }
   }
 
   /**
@@ -192,12 +199,9 @@ export class PlayBillingService {
    * @param {string} subType - The type of subscription purchase (upgrade, downgrade, or normal purchase)
    */
   async purchase(purchaseSku, oldPurchase, subType) {
-    if (!this.service || this.skus.length == 0) await this.init();
-
+    const skus = await this.getSkus();
     const sku =
-      typeof purchaseSku === 'string'
-        ? this.skus.find((s) => s.itemId === purchaseSku)
-        : purchaseSku;
+      typeof purchaseSku === 'string' ? skus.find((s) => s.itemId === purchaseSku) : purchaseSku;
 
     /* 
     Set appropriate proration mode based on scenario. 
@@ -247,7 +251,7 @@ export class PlayBillingService {
   }
 
   /**
-   *
+   * Call the backend to validate purchase
    * @param {PlayBillingServiceSku} sku
    * @param {string} token
    */

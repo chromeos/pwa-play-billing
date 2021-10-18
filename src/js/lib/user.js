@@ -56,7 +56,7 @@ export class User {
    * @param {PlayBillingSkuConfig|PlayBillingServiceSku|PurchaseDetailsWithType} sku - SKU to grant entitlement for
    * @param {string} token - Purchase token
    */
-  async grantEntitlement(sku, token) {
+  async grantEntitlementAndAcknowledge(sku, token) {
     let request = '';
 
     if (sku.purchaseType === 'subscription') {

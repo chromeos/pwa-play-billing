@@ -237,12 +237,22 @@ app.post('/addCoins', async (request: RequestWithUser, response: functions.Respo
 
   // Add the items to the user account
   const addedCoins = await purchases.addCoins(authenticatedUserRef, purchase);
-  if (addedCoins) {
-    response.json({ status: 'Purchase verified and coins granted' });
+  if (!addedCoins) {
+    response.status(503).json({ error: 'error granting coins entitlement.' });
+    return;
+  }
+  // If purchase has not been acknowledged, acknowledge it
+  if (!purchase.wasAcknowledged()) {
+    const purchaseAcknowledged = await purchases.acknowledgeInAppPurchase(sku, purchaseToken);
+    if (purchaseAcknowledged) {
+      response.json({ status: 'Purchase verified and coins granted.' });
+      return;
+    }
+    response.json({ error: 'Error acknowledging purchase' });
     return;
   }
 
-  response.status(503).json({ error: 'error granting coins entitlement.' });
+  response.json({ status: 'Purchase was already acknowledged' });
 });
 
 app.post('/addPhoto', async (request: RequestWithUser, response: functions.Response) => {
@@ -279,12 +289,22 @@ app.post('/addPhoto', async (request: RequestWithUser, response: functions.Respo
 
   // Add photo user account's photo entitlements
   const addedPhoto = await purchases.addPhoto(authenticatedUserRef, purchase);
-  if (addedPhoto) {
-    response.json({ status: 'Purchase verified and photo added' });
+  if (!addedPhoto) {
+    response.status(503).json({ error: 'error granting photo entitlement.' });
     return;
   }
-
-  response.status(503).json({ error: 'error granting photo entitlement.' });
+  // If purchase has not been acknowledged, acknowledge it
+  if (!purchase.wasAcknowledged()) {
+    const purchaseAcknowledged = await purchases.acknowledgeInAppPurchase(sku, purchaseToken);
+    if (purchaseAcknowledged) {
+      response.json({ status: 'Purchase verified and photo added.' });
+      return;
+    }
+    response.json({ error: 'Error acknowledging purchase' });
+    return;
+  }
+  
+  response.json({ status: 'Purchase was already acknowledged' });
 });
 
 app.post('/removePhoto', async (request: RequestWithUser, response: functions.Response) => {
@@ -345,20 +365,34 @@ app.post('/setHasSub', async (request: RequestWithUser, response: functions.Resp
   const sku: string = request.body?.sku;
   const purchaseToken: string = request.body?.token;
 
-  let setSub = false;
-
   // Verify purchase with Play Developer API
   const subPurchase = await purchases.fetchSubscriptionPurchase(sku, purchaseToken);
-  if (subPurchase?.isEntitlementActive()) {
-    setSub = await purchases.setHasSub(authenticatedUserRef, subPurchase, sku, true);
-  }
 
-  if (setSub) {
-    response.json({ status: `set hasSub for ${sku}` });
+  if (!subPurchase || !subPurchase.isEntitlementActive()) {
+    console.error('Cannot determine if subscription purchase is valid');
+    response.status(503).json({ error: 'Error adding subscription. Purchase not verified' });
     return;
   }
 
-  response.json({ error: `Error setting hasSub for ${sku}.` });
+  // Add subscription entitlement to user
+  const setSub = await purchases.setHasSub(authenticatedUserRef, subPurchase, sku, true);
+
+  if (!setSub) {
+    response.json({ error: `Error setting hasSub for ${sku}.` });
+    return;
+  }
+  // If purchase has not been acknowledged, acknowledge it
+  if (!subPurchase.wasAcknowledged()) {
+    const purchaseAcknowledged = await purchases.acknowledgeSubPurchase(sku, purchaseToken);
+    if (purchaseAcknowledged) {
+      response.json({ status: 'Subscription purchase verified and granted.' });
+      return;
+    }
+    response.json({ error: 'Error acknowledging purchase' });
+    return;
+  }
+
+  response.json({ status: 'Sub purchase was already acknowledged' });
 });
 
 app.post('/validatePurchase', async (request: functions.Request, response: functions.Response) => {
