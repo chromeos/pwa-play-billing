@@ -89,6 +89,9 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   const skuList = document.querySelector('#items-to-buy');
 
   purchases.subscribe((updatedPurchases) => {
+    if (updatedPurchases.length > 0) {
+      log(`listPurchases returned ${JSON.stringify(updatedPurchases)}`);
+    }
     skuList.purchases = updatedPurchases;
   });
 
@@ -137,12 +140,15 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   async function marketSetup() {
     // Check to see if the Digital Goods API is available
     if (await service.isAvailable()) {
+      log('Digital Goods Service is available!');
       try {
         // Attach the service to skuList
         skuList.service = service;
         coinDialog.service = service;
 
-        availableItems.set((await service.getSkus()) || []);
+        const skus = await service.getSkus();
+        log(`getDetails returned ${JSON.stringify(skus)}`);
+        availableItems.set(skus || []);
 
         await refreshPurchases(service, user);
 

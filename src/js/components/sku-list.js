@@ -81,39 +81,34 @@ class SkuList extends LitElement {
         .type="${skuType}"
         .details=${sku}
         price="${this.service.getSkuPrice(sku, this.locale)}"
-        .purchase=${purchase
-          ? null
-          : async function () {
-              let purchaseMade;
-              switch (skuType) {
-                case 'downgrade':
-                  // downgrade from premium to basic subscription
-                  purchaseMade = await this.service.purchase(
-                    sku.itemId,
-                    premiumSubPurchase,
-                    skuType,
-                  );
-                  break;
-                case 'upgrade':
-                  // upgrade from basic to premium subscription
-                  purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase, skuType);
-                  break;
-                default:
-                  // make a normal purchase
-                  purchaseMade = await this.service.purchase(sku.itemId);
-              }
-              const { response, valid } = purchaseMade;
-              const e = new CustomEvent('sku-purchase', {
-                detail: {
-                  sku,
-                  response,
-                  valid,
-                },
-                bubbles: true,
-                composed: true,
-              });
-              this.dispatchEvent(e);
-            }.bind(this)}
+        .purchased=${purchase != null}
+        .purchase=${async function () {
+          let purchaseMade;
+          switch (skuType) {
+            case 'downgrade':
+              // downgrade from premium to basic subscription
+              purchaseMade = await this.service.purchase(sku.itemId, premiumSubPurchase, skuType);
+              break;
+            case 'upgrade':
+              // upgrade from basic to premium subscription
+              purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase, skuType);
+              break;
+            default:
+              // make a normal purchase
+              purchaseMade = await this.service.purchase(sku.itemId);
+          }
+          const { response, valid } = purchaseMade;
+          const e = new CustomEvent('sku-purchase', {
+            detail: {
+              sku,
+              response,
+              valid,
+            },
+            bubbles: true,
+            composed: true,
+          });
+          this.dispatchEvent(e);
+        }.bind(this)}
         .consume=${purchase
           ? async function () {
               await this.service.consume(purchase.purchaseToken);
