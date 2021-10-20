@@ -172,6 +172,24 @@ export class PlayBillingService {
     }).format(Number(sku.price.value));
   }
 
+  /*
+   * In the Digital Goods API v2.0, coming in M96 to Chrome, the client-side
+   * acknowledge() method in the API has been removed.
+   *
+   * Instead, you can acknowledge purchases from a backend server using the Google Play
+   * Developer API. The server has direct access to the user database, so using
+   * the Google Play Developer API for acknowledgement is more reliable and less
+   * vulnerable to fraud than acknowledging purchaes client-side.
+   *
+   * You should grant entitlements then acknowledge the purchase together in your
+   * backend server. Therefore, we have removed the acknowledge() method in
+   * this file, play-billing.js. Instead, we have a method grantEntitlementAndAcknowledge()
+   * in src/js/lib/user.js that will send a POST request to our backend server
+   * to verify the purchase, grant the entitlement, then call the appropriate Google Play
+   * Developer API endpoint to acknowledge the purchase.
+   *
+   */
+
   /**
    * Forces a purchase token to be consumed.
    * Purchases are coerced into a 'repeatable' type as that's the only type that will trigger consumption in Play

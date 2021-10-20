@@ -167,7 +167,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
             const token = e.detail.response.details.token;
             await user.grantEntitlementAndAcknowledge(sku, token);
             /*
-             * Note that we have moved purchase acknolwedgement to the backend
+             * Note that we have moved purchase acknowledgement to the backend
              * server via the Google Play Developer API to be more secure.
              * Granting entitlements and acknowledging the purchase now
              * happen in the same call on the backend.
