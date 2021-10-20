@@ -76,10 +76,7 @@ export async function acknowledgeInAppPurchase(
  * @param {string} purchaseToken
  * @return {(Promise<boolean>)} whether the acknowledgement of the subscription purchase was successful
  */
-export async function acknowledgeSubPurchase(
-  sku: string,
-  purchaseToken: string,
-): Promise<boolean> {
+export async function acknowledgeSubPurchase(sku: string, purchaseToken: string): Promise<boolean> {
   try {
     const apiResponse = await playApi.purchases.subscriptions.acknowledge({
       packageName: myconfig.packageName,
