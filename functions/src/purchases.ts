@@ -46,11 +46,12 @@ interface ChangeResult {
  *
  * @param {string} sku is the sku that is attempting to be validated
  * @param {string} purchaseToken is the token that was provided with this sku to be validated.
+ * @return {(Promise<boolean>)} whether the acknowledgement of the in-app purchase was successful
  */
 export async function acknowledgeInAppPurchase(
   sku: string,
   purchaseToken: string,
-): Promise<boolean | null> {
+): Promise<boolean> {
   try {
     const apiResponse = (
       await playApi.purchases.products.acknowledge({
@@ -65,7 +66,7 @@ export async function acknowledgeInAppPurchase(
     return false;
   } catch (error) {
     console.error(`Error acknowledging in-app purchase : ${error}`);
-    return null;
+    return false;
   }
 }
 
@@ -73,11 +74,12 @@ export async function acknowledgeInAppPurchase(
  * Acknowledge a subscription purchase with  Play Developer API.
  * @param {string} sku
  * @param {string} purchaseToken
+ * @return {(Promise<boolean>)} whether the acknowledgement of the subscription purchase was successful
  */
 export async function acknowledgeSubPurchase(
   sku: string,
   purchaseToken: string,
-): Promise<boolean | null> {
+): Promise<boolean> {
   try {
     const apiResponse = await playApi.purchases.subscriptions.acknowledge({
       packageName: myconfig.packageName,
@@ -90,7 +92,7 @@ export async function acknowledgeSubPurchase(
     return false;
   } catch (error) {
     console.error(`Error acknowledging subscription purchase : ${error}`);
-    return null;
+    return false;
   }
 }
 
