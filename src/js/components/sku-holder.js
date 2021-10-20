@@ -67,7 +67,6 @@ class SkuHolder extends LitElement {
       console.log('Consume funcition not set.');
     };
     this.type = 'sku';
-    this.purchased = false;
   }
 
   /**
@@ -130,7 +129,7 @@ class SkuHolder extends LitElement {
         <p>${this.details.description}</p>
         ${this.type === 'coin'
           ? html``
-          : html`<p>You currently ${this.purchased ? '' : `don't`} own this item.</p>`}
+          : html`<p>You currently ${this.purchase === null ? '' : `don't`} own this item.</p>`}
         ${this.purchaseBtn()} ${this.hasConsumeBtn(this.details.purchaseType)}
       </div>
     `;
