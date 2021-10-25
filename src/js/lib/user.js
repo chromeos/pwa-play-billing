@@ -56,7 +56,7 @@ export class User {
    * @param {PlayBillingSkuConfig|PlayBillingServiceSku|PurchaseDetailsWithType} sku - SKU to grant entitlement for
    * @param {string} token - Purchase token
    */
-  async grantEntitlement(sku, token) {
+  async grantEntitlementAndAcknowledge(sku, token) {
     let request = '';
 
     if (sku.purchaseType === 'subscription') {
@@ -85,6 +85,32 @@ export class User {
       // TODO: check for error in response
     } catch (error) {
       this.log('Failed to grant entitlement');
+      this.log(error.message);
+    }
+  }
+
+  /**
+   * Send request to remove entitlement for onetime purchase attached to the user in the backend.
+   * @param {PurchaseDetailsWithType} purchase - purchase to remove entitlement for
+   */
+  async removeEntitlement(purchase) {
+    const request = '/api/removePhoto';
+
+    try {
+      const response = await (
+        await fetch(request, {
+          method: 'POST',
+          headers: this.auth,
+          body: JSON.stringify({
+            sku: purchase.itemId,
+            token: purchase.purchaseToken,
+          }),
+        })
+      ).json();
+      this.log(JSON.stringify(response));
+      // TODO: check for error in response
+    } catch (error) {
+      this.log('Failed to remove entitlement');
       this.log(error.message);
     }
   }

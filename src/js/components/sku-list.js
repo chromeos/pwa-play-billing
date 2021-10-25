@@ -116,11 +116,10 @@ class SkuList extends LitElement {
             }.bind(this)}
         .consume=${purchase
           ? async function () {
-              const response = await this.service.consume(purchase.purchaseToken);
+              await this.service.consume(purchase.purchaseToken);
               const e = new CustomEvent('sku-consume', {
                 detail: {
                   purchase,
-                  response,
                 },
                 bubbles: true,
                 composed: true,

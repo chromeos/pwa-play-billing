@@ -42,6 +42,58 @@ interface ChangeResult {
 }
 
 /**
+ *  Acknowledge an in-app item purchase with Play Developer API.
+ *
+ * @param {string} sku is the sku that is attempting to be validated
+ * @param {string} purchaseToken is the token that was provided with this sku to be validated.
+ * @return {(Promise<boolean>)} whether the acknowledgement of the in-app purchase was successful
+ */
+export async function acknowledgeInAppPurchase(
+  sku: string,
+  purchaseToken: string,
+): Promise<boolean> {
+  try {
+    const apiResponse = (
+      await playApi.purchases.products.acknowledge({
+        packageName: myconfig.packageName,
+        productId: sku,
+        token: purchaseToken,
+      })
+    )?.data;
+    if (JSON.stringify(apiResponse) === `""`) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error(`Error acknowledging in-app purchase : ${error}`);
+    return false;
+  }
+}
+
+/**
+ * Acknowledge a subscription purchase with  Play Developer API.
+ * @param {string} sku
+ * @param {string} purchaseToken
+ * @return {(Promise<boolean>)} whether the acknowledgement of the subscription purchase was successful
+ */
+export async function acknowledgeSubPurchase(sku: string, purchaseToken: string): Promise<boolean> {
+  try {
+    const apiResponse = await playApi.purchases.subscriptions.acknowledge({
+      packageName: myconfig.packageName,
+      subscriptionId: sku,
+      token: purchaseToken,
+    });
+    if (JSON.stringify(apiResponse) === `""`) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error(`Error acknowledging subscription purchase : ${error}`);
+    return false;
+  }
+}
+
+/**
  *  Fetch a purchase from the Play Developer API and validate that it has not been consumed already.
  *
  * @param {string} sku is the sku that is attempting to be validated
@@ -202,7 +254,7 @@ export async function addPhoto(
   const existingPhotos = userData.photoEntitlements;
   if (existingPhotos.includes(purchase.productId)) {
     console.error(`User already owns photo ${purchase.productId}`);
-    return false;
+    return true;
   } else {
     // Add the purchase to the token store.
     const tokenAdded = await addPurchaseToken(userRef, purchase);
@@ -226,6 +278,45 @@ export async function addPhoto(
       });
   }
 }
+
+/**
+ * Remove photo from user's photo entitlements
+ * @param {FirebaseFirestore.DocumentReference} userRef
+ * @param {billing.Purchase} purchase
+ */
+export async function removePhoto(
+  userRef: FirebaseFirestore.DocumentReference,
+  purchase: billing.Purchase,
+): Promise<boolean> {
+  if (!userRef) {
+    return false;
+  }
+
+  const userData = await getUserData(userRef);
+  if (!userData) {
+    return false;
+  }
+
+  const existingPhotos = userData.photoEntitlements;
+  if (existingPhotos.includes(purchase.productId)) {
+    const index = existingPhotos.indexOf(purchase.productId);
+    existingPhotos.splice(index, 1);
+    return userRef
+      .update({
+        photoEntitlements: existingPhotos,
+      })
+      .then(function (): boolean {
+        console.log(`Removed ${purchase.productId} from photo entitlements`);
+        return true;
+      })
+      .catch(function (error: Error): boolean {
+        console.error(`Could not remove ${purchase.productId} from users reference : ${error}`);
+        return false;
+      });
+  }
+  return false;
+}
+
 /**
  * Grant/remove entitlement for the Basic or Premium subscription
  *

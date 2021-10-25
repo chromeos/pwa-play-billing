@@ -42,37 +42,36 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   const firebase = new Firebase(appBar, log);
 
   let user = null;
-
   let service = null;
 
-  // Check to see if the Digital Goods API is available
-  if ('getDigitalGoodsService' in window) {
-    // Get SKUs from back-end
-    try {
-      let { skus } = await (await fetch('/api/getSkus')).json();
-      // Convert to PlayBillingSkuConfig style for Play Billing Service class
-      skus = skus.map((sku) => ({
-        itemId: sku.sku,
-        purchaseType: sku.type,
-      }));
+  // Get SKUs from back-end
+  try {
+    let { skus } = await (await fetch('/api/getSkus')).json();
+    // Convert to PlayBillingSkuConfig style for Play Billing Service class
+    skus = skus.map((sku) => ({
+      itemId: sku.sku,
+      purchaseType: sku.type,
+    }));
 
-      // Set up an instance of Play Billing Service
-      const { PlayBillingService } = await import('./lib/play-billing');
-      service = new PlayBillingService(skus);
-    } catch (e) {
-      log(e);
-    }
+    // Set up an instance of Play Billing Service
+    const { PlayBillingService } = await import('./lib/play-billing');
+    service = new PlayBillingService(skus);
+  } catch (e) {
+    log(e);
   }
 
   authenticated.subscribe(async (auth) => {
     if (auth) {
       // Gets the user's profile and sets the number of coins a user has
       user = new User(await firebase.getApiHeader(), log);
-      await refreshPurchases(service, user);
+      if (service) {
+        await marketSetup();
+      }
     } else {
       user = null;
       profile.set({});
       purchases.set([]);
+      availableItems.set([]);
     }
   });
 
@@ -90,6 +89,9 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   const skuList = document.querySelector('#items-to-buy');
 
   purchases.subscribe((updatedPurchases) => {
+    if (updatedPurchases.length > 0) {
+      log(`listPurchases returned ${JSON.stringify(updatedPurchases)}`);
+    }
     skuList.purchases = updatedPurchases;
   });
 
@@ -116,7 +118,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     if (await user.setTheme(purchasedColor)) {
       // Need to catch errors
       notify(`Color ${purchasedColor} successfully purchased`);
-      refreshPurchases(service, user);
+      await refreshPurchases(service, user);
     } else {
       notify(`Purchase failed`);
     }
@@ -132,45 +134,60 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     themePicker.resetPickerSelection();
   });
 
-  // Check to see if the Digital Goods API is available
-  if (service) {
-    try {
-      // Attach the service to skuList
-      skuList.service = service;
-      coinDialog.service = service;
+  /**
+   * Sets up the available skus to be displayed in the app for purchase and consumption
+   */
+  async function marketSetup() {
+    // Check to see if the Digital Goods API is available
+    if (await service.isAvailable()) {
+      log('Digital Goods Service is available!');
+      try {
+        // Attach the service to skuList
+        skuList.service = service;
+        coinDialog.service = service;
 
-      availableItems.set((await service.getSkus()) || []);
+        const skus = await service.getSkus();
+        log(`getDetails returned ${JSON.stringify(skus)}`);
+        availableItems.set(skus || []);
 
-      await refreshPurchases(service, user);
-
-      document.addEventListener('sku-consume', async (e) => {
-        log(`Sku ${e.detail.purchase.itemId} was consumed`);
         await refreshPurchases(service, user);
-      });
 
-      document.addEventListener('sku-purchase', async (e) => {
-        if (e.detail.valid) {
-          log(`Sku ${e.detail.sku.itemId} was purchased`);
-          const sku = e.detail.sku;
-          const token = e.detail.response.details.token;
-          await user.grantEntitlement(sku, token);
-          /*
-           * Note that for the purposes of this sample to use Digital Goods API,
-           * purchases are acknowledged in the client app but we recommend acknowledging
-           * purchases in your backend server via the Google Play Developer API,
-           * to be more secure. In this sample app, we only acknowledge purchases
-           * after successfully validating the purchasetoken and purchase state in our server.
-           */
-          await service.acknowledge(token, sku);
-          // Refreshes the profiles entitlements and the purchased items.
+        document.addEventListener('sku-consume', async (e) => {
+          const purchase = e.detail.purchase;
+          log(`Sku ${purchase.itemId} was consumed`);
+          await user.removeEntitlement(purchase);
           await refreshPurchases(service, user);
-          notify(`${sku.title} Purchased!`);
-        }
-      });
-    } catch (e) {
-      log(e);
+          notify(`${purchase.itemId} Consumed!`);
+        });
+
+        document.addEventListener('sku-purchase', async (e) => {
+          if (e.detail.valid) {
+            const sku = e.detail.sku;
+            log(`Sku ${sku.itemId} was purchased`);
+            const token = e.detail.response.details.token;
+            await user.grantEntitlementAndAcknowledge(sku, token);
+            /*
+             * Note that we have moved purchase acknowledgement to the backend
+             * server via the Google Play Developer API to be more secure.
+             * Granting entitlements and acknowledging the purchase now
+             * happen in the same call on the backend.
+             *
+             * Please see functions/src/index.ts for the implementation.
+             */
+            // If purchase is repeatable, consume it immediately
+            if (service.getPurchaseType(sku) === 'repeatable') {
+              await service.consume(token);
+            }
+            // Refreshes the profiles entitlements and the purchased items.
+            await refreshPurchases(service, user);
+            notify(`${sku.title} Purchased!`);
+          }
+        });
+      } catch (e) {
+        log(e);
+      }
+    } else {
+      log('The Digital Goods API is required for this demo!');
     }
-  } else {
-    log('The Digital Goods API is required for this demo!');
   }
 });
