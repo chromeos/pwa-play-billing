@@ -78,11 +78,13 @@ export async function acknowledgeInAppPurchase(
  */
 export async function acknowledgeSubPurchase(sku: string, purchaseToken: string): Promise<boolean> {
   try {
-    const apiResponse = await playApi.purchases.subscriptions.acknowledge({
-      packageName: myconfig.packageName,
-      subscriptionId: sku,
-      token: purchaseToken,
-    });
+    const apiResponse = (
+      await playApi.purchases.subscriptions.acknowledge({
+        packageName: myconfig.packageName,
+        subscriptionId: sku,
+        token: purchaseToken,
+      })
+    )?.data;
     if (JSON.stringify(apiResponse) === `""`) {
       return true;
     }
