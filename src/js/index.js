@@ -21,7 +21,13 @@ import './components';
 
 import { Firebase } from './lib/firebase';
 import { User } from './lib/user';
-import { authenticated, profile, purchases, availableItems } from './lib/application-store';
+import {
+  authenticated,
+  profile,
+  purchases,
+  availableItems,
+  purchaseHistory,
+} from './lib/application-store';
 import { changeTheme, Log, refreshPurchases, VALID_THEME_NAMES, Notifier } from './lib/utils';
 
 window.addEventListener('DOMContentLoaded', async (event) => {
@@ -93,6 +99,12 @@ window.addEventListener('DOMContentLoaded', async (event) => {
       log(`listPurchases returned ${JSON.stringify(updatedPurchases)}`);
     }
     skuList.purchases = updatedPurchases;
+  });
+
+  purchaseHistory.subscribe((updatedPurchaseHistory) => {
+    if (updatedPurchaseHistory.length > 0) {
+      log(`listPurchaseHistory returned ${JSON.stringify(updatedPurchaseHistory)}`);
+    }
   });
 
   availableItems.subscribe((updatedAvailableItems) => {
