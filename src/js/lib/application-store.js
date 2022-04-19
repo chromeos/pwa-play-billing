@@ -22,4 +22,7 @@ export const profile = writable({});
 
 // SKU information.
 export const availableItems = writable([]);
+
+// Purchases and purchase history information.
 export const purchases = writable([]);
+export const purchaseHistory = writable([]);

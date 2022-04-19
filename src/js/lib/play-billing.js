@@ -148,6 +148,29 @@ export class PlayBillingService {
   }
 
   /**
+   * List most recent purchase for each item, even if they are no longer entitlements (e.g. has been consumed, cancelled, or expired).
+   * @return {PurchaseDetails[]} Also includes the purchase's purchase type
+   */
+  async getPurchaseHistory() {
+    if (!(await this.isAvailable())) {
+      throw new Error('DGAPI Play Billing is not available.');
+    }
+
+    if (this.skus.length == 0) {
+      await this.updateSkus();
+    }
+
+    let purchaseHistory = [];
+
+    if ('listPurchaseHistory' in this.service) {
+      // DGAPI 2.1
+      purchaseHistory = await this.service.listPurchaseHistory();
+    }
+
+    return Object.freeze(purchaseHistory);
+  }
+
+  /**
    * List available SKUs
    * @return {Promise<PlayBillingServiceSku[]>}
    */
