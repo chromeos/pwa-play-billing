@@ -351,37 +351,67 @@ export async function setHasSub(
       });
   }
 
-  switch (sku) {
-    case SKU_BASIC_SUB:
-      return await userRef
-        .update({
-          hasBasicSub: hasSub,
-        })
-        .then(function (): boolean {
-          console.log(`Set hasBasicSub to: ${hasSub}`);
-          return true;
-        })
-        .catch(function (error: any): boolean {
-          console.error('Error setHasSub.', error);
-          return false;
-        });
-    case SKU_PREMIUM_SUB:
-      return await userRef
-        .update({
-          hasPremiumSub: hasSub,
-        })
-        .then(function (): boolean {
-          console.log(`Set hasPremiumSub to: ${hasSub}`);
-          return true;
-        })
-        .catch(function (error: any): boolean {
-          console.error('Error setHasSub.', error);
-          return false;
-        });
-    default:
-      console.error(`Error: ${sku} is not a valid subscription type.`);
-      return false;
+  if (sku.startsWith(SKU_BASIC_SUB)) {
+    return await userRef
+      .update({
+        hasBasicSub: hasSub,
+      })
+      .then(function (): boolean {
+        console.log(`Set hasBasicSub to: ${hasSub}`);
+        return true;
+      })
+      .catch(function (error: any): boolean {
+        console.error('Error setHasSub.', error);
+        return false;
+      });
+  } else if (sku.startsWith(SKU_PREMIUM_SUB)) {
+    return await userRef
+      .update({
+        hasPremiumSub: hasSub,
+      })
+      .then(function (): boolean {
+        console.log(`Set hasPremiumSub to: ${hasSub}`);
+        return true;
+      })
+      .catch(function (error: any): boolean {
+        console.error('Error setHasSub.', error);
+        return false;
+      });
+  } else {
+    console.error(`Error: ${sku} is not a valid subscription type.`);
+    return false;
   }
+  // switch (sku) {
+  //   case SKU_BASIC_SUB:
+  //     return await userRef
+  //       .update({
+  //         hasBasicSub: hasSub,
+  //       })
+  //       .then(function (): boolean {
+  //         console.log(`Set hasBasicSub to: ${hasSub}`);
+  //         return true;
+  //       })
+  //       .catch(function (error: any): boolean {
+  //         console.error('Error setHasSub.', error);
+  //         return false;
+  //       });
+  //   case SKU_PREMIUM_SUB:
+  //     return await userRef
+  //       .update({
+  //         hasPremiumSub: hasSub,
+  //       })
+  //       .then(function (): boolean {
+  //         console.log(`Set hasPremiumSub to: ${hasSub}`);
+  //         return true;
+  //       })
+  //       .catch(function (error: any): boolean {
+  //         console.error('Error setHasSub.', error);
+  //         return false;
+  //       });
+  //   default:
+  //     console.error(`Error: ${sku} is not a valid subscription type.`);
+  //     return false;
+  // }
 }
 /**
  * Grant coin benefits for the Basic or Premium subscriptions
@@ -402,35 +432,66 @@ export async function grantSubBenefits(
     return false;
   }
 
-  switch (sku) {
-    case SKU_BASIC_SUB:
-      return await userRef
-        .update({
-          numCoins: userData.numCoins + 2000,
-        })
-        .then(function (): boolean {
-          console.log(`Added 2000 coins for ${SKU_BASIC_SUB}`);
-          return true;
-        })
-        .catch(function (error: any): boolean {
-          console.error(`Error adding coins for ${SKU_BASIC_SUB}.`, error);
-          return false;
-        });
-    case SKU_PREMIUM_SUB:
-      return await userRef
-        .update({
-          numCoins: userData.numCoins + 5000,
-        })
-        .then(function (): boolean {
-          console.log(`Added 5000 coins for ${SKU_PREMIUM_SUB}`);
-          return true;
-        })
-        .catch(function (error: any): boolean {
-          console.error(`Error adding coins for ${SKU_PREMIUM_SUB}.`, error);
-          return false;
-        });
-    default:
-      console.error(`Error: ${sku} is not a valid subscription type.`);
-      return false;
+  if (sku.startsWith(SKU_BASIC_SUB)) {
+    return await userRef
+      .update({
+        numCoins: userData.numCoins + 2000,
+      })
+      .then(function (): boolean {
+        console.log(`Added 2000 coins for ${SKU_BASIC_SUB}`);
+        return true;
+      })
+      .catch(function (error: any): boolean {
+        console.error(`Error adding coins for ${SKU_BASIC_SUB}.`, error);
+        return false;
+      });
+  } else if (sku.startsWith(SKU_PREMIUM_SUB)) {
+    return await userRef
+      .update({
+        numCoins: userData.numCoins + 5000,
+      })
+      .then(function (): boolean {
+        console.log(`Added 5000 coins for ${SKU_PREMIUM_SUB}`);
+        return true;
+      })
+      .catch(function (error: any): boolean {
+        console.error(`Error adding coins for ${SKU_PREMIUM_SUB}.`, error);
+        return false;
+      });
+  } else {
+    console.error(`Error: ${sku} is not a valid subscription type.`);
+    return false;
   }
+
+  // switch (sku) {
+  //   case SKU_BASIC_SUB:
+  //     return await userRef
+  //       .update({
+  //         numCoins: userData.numCoins + 2000,
+  //       })
+  //       .then(function (): boolean {
+  //         console.log(`Added 2000 coins for ${SKU_BASIC_SUB}`);
+  //         return true;
+  //       })
+  //       .catch(function (error: any): boolean {
+  //         console.error(`Error adding coins for ${SKU_BASIC_SUB}.`, error);
+  //         return false;
+  //       });
+  //   case SKU_PREMIUM_SUB:
+  //     return await userRef
+  //       .update({
+  //         numCoins: userData.numCoins + 5000,
+  //       })
+  //       .then(function (): boolean {
+  //         console.log(`Added 5000 coins for ${SKU_PREMIUM_SUB}`);
+  //         return true;
+  //       })
+  //       .catch(function (error: any): boolean {
+  //         console.error(`Error adding coins for ${SKU_PREMIUM_SUB}.`, error);
+  //         return false;
+  //       });
+  //   default:
+  //     console.error(`Error: ${sku} is not a valid subscription type.`);
+  //     return false;
+  // }
 }

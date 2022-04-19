@@ -160,7 +160,26 @@ window.addEventListener('DOMContentLoaded', async (event) => {
 
         const skus = await service.getSkus();
         log(`getDetails returned ${JSON.stringify(skus)}`);
-        availableItems.set(skus || []);
+        const filteredSkus = skus.filter(
+          (sku) => sku.purchaseType != 'onetime' && sku.purchaseType != 'subscription',
+        );
+        const onetimeSkus = skus.filter((sku) => sku.purchaseType === 'onetime');
+        const basicSubSkus = skus.filter(
+          (sku) => sku.purchaseType === 'subscription' && sku.itemId.startsWith('basic'),
+        );
+
+        const randomOnetime = onetimeSkus[Math.floor(Math.random() * onetimeSkus.length)];
+        const randomBasicSub = basicSubSkus[Math.floor(Math.random() * basicSubSkus.length)];
+
+        const subNum = randomBasicSub.itemId.slice(9);
+        const premiumSubId = 'premium_sub' + subNum;
+        const premiumSub = skus.find((sku) => sku.itemId === premiumSubId);
+
+        filteredSkus.push(randomOnetime);
+        filteredSkus.push(randomBasicSub);
+        filteredSkus.push(premiumSub);
+
+        availableItems.set(filteredSkus || []);
 
         await refreshPurchases(service, user);
 

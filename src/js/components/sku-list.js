@@ -51,19 +51,42 @@ class SkuList extends LitElement {
   }
 
   /**
-   *
-   * @param {PurchaseDetails} basicSubPurchase
-   * @param {PurchaseDetails} premiumSubPurchase
-   * @param {string} itemId
-   * @return {string}
+   * @typedef {Object} SkuTypeAndReplacedSKu
+   * @property {string} skuType - sku type
+   * @property {PurchaseDetails|undefined} purchaseDetails - purchase details for the replaced sku if upgrade or downgrade
    */
-  skuType(basicSubPurchase, premiumSubPurchase, itemId) {
-    if (itemId === BASIC_SUB && premiumSubPurchase) {
-      return 'downgrade';
-    } else if (itemId === PREMIUM_SUB && basicSubPurchase) {
-      return 'upgrade';
+
+  /**
+   *
+   * @param {PurchaseDetails[]} basicSubPurchases
+   * @param {PurchaseDetails[]} premiumSubPurchases
+   * @param {string} itemId
+   * @return {SkuTypeAndReplacedSKu}
+   */
+  skuType(basicSubPurchases, premiumSubPurchases, itemId) {
+    let subNum = 0;
+    if (itemId.startsWith(BASIC_SUB)) {
+      subNum = itemId.slice(BASIC_SUB.length);
+    } else if (itemId.startsWith(PREMIUM_SUB)) {
+      subNum = itemId.slice(PREMIUM_SUB.length);
+    }
+
+    const matchingBasicSubPurchase = basicSubPurchases.find((basicSubPurchase) =>
+      subNum.length == 0
+        ? basicSubPurchase.itemId === BASIC_SUB
+        : basicSubPurchase.itemId.endsWith(subNum),
+    );
+    const matchingPremiumSubPurchase = premiumSubPurchases.find((premiumSubPurchase) =>
+      subNum.length == 0
+        ? premiumSubPurchase.itemId === PREMIUM_SUB
+        : premiumSubPurchase.itemId.endsWith(subNum),
+    );
+    if (itemId.startsWith(BASIC_SUB) && matchingPremiumSubPurchase) {
+      return { skuType: 'downgrade', oldPurchase: matchingPremiumSubPurchase };
+    } else if (itemId.startsWith(PREMIUM_SUB) && matchingBasicSubPurchase) {
+      return { skuType: 'upgrade', oldPurchase: matchingBasicSubPurchase };
     } else {
-      return this.type;
+      return { skuType: this.type };
     }
   }
 
@@ -71,12 +94,20 @@ class SkuList extends LitElement {
    * @return {TemplateResult}
    */
   render() {
-    const basicSubPurchase = this.purchases.find((purchase) => purchase.itemId === BASIC_SUB);
-    const premiumSubPurchase = this.purchases.find((purchase) => purchase.itemId === PREMIUM_SUB);
+    const basicSubPurchases = this.purchases.filter((purchase) =>
+      purchase.itemId.startsWith(BASIC_SUB),
+    );
+    const premiumSubPurchases = this.purchases.filter((purchase) =>
+      purchase.itemId.startsWith(PREMIUM_SUB),
+    );
     return html`${this.skus.map((sku) => {
       // Find if there's a purchase with the same itemId as the SKU
       const purchase = this.purchases.find((purchase) => purchase.itemId === sku.itemId);
-      const skuType = this.skuType(basicSubPurchase, premiumSubPurchase, sku.itemId);
+      const { skuType, oldPurchase } = this.skuType(
+        basicSubPurchases,
+        premiumSubPurchases,
+        sku.itemId,
+      );
       return html` <sku-holder
         .type="${skuType}"
         .details=${sku}
@@ -88,15 +119,11 @@ class SkuList extends LitElement {
               switch (skuType) {
                 case 'downgrade':
                   // downgrade from premium to basic subscription
-                  purchaseMade = await this.service.purchase(
-                    sku.itemId,
-                    premiumSubPurchase,
-                    skuType,
-                  );
+                  purchaseMade = await this.service.purchase(sku.itemId, oldPurchase, skuType);
                   break;
                 case 'upgrade':
                   // upgrade from basic to premium subscription
-                  purchaseMade = await this.service.purchase(sku.itemId, basicSubPurchase, skuType);
+                  purchaseMade = await this.service.purchase(sku.itemId, oldPurchase, skuType);
                   break;
                 default:
                   // make a normal purchase
