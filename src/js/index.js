@@ -21,7 +21,13 @@ import './components';
 
 import { Firebase } from './lib/firebase';
 import { User } from './lib/user';
-import { authenticated, profile, purchases, availableItems } from './lib/application-store';
+import {
+  authenticated,
+  profile,
+  purchases,
+  availableItems,
+  purchaseHistory,
+} from './lib/application-store';
 import { changeTheme, Log, refreshPurchases, VALID_THEME_NAMES, Notifier } from './lib/utils';
 
 window.addEventListener('DOMContentLoaded', async (event) => {
@@ -95,6 +101,12 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     skuList.purchases = updatedPurchases;
   });
 
+  purchaseHistory.subscribe((updatedPurchaseHistory) => {
+    if (updatedPurchaseHistory.length > 0) {
+      log(`listPurchaseHistory returned ${JSON.stringify(updatedPurchaseHistory)}`);
+    }
+  });
+
   availableItems.subscribe((updatedAvailableItems) => {
     skuList.skus = [];
     coinDialog.coinSkus = [];
@@ -140,7 +152,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   async function marketSetup() {
     // Check to see if the Digital Goods API is available
     if (await service.isAvailable()) {
-      log('Digital Goods Service is available!');
+      log('Digital Goods Service is available and connected to Play Billing!');
       try {
         // Attach the service to skuList
         skuList.service = service;
