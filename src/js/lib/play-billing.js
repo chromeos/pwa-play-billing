@@ -164,7 +164,13 @@ export class PlayBillingService {
 
     if ('listPurchaseHistory' in this.service) {
       // DGAPI 2.1
-      purchaseHistory = await this.service.listPurchaseHistory();
+      try {
+        purchaseHistory = await this.service.listPurchaseHistory();
+      } catch (error) {
+        // Using an older version of android-browser-helper
+        // where listPurchaseHistory() is not available.
+        return [];
+      }
     }
 
     return Object.freeze(purchaseHistory);

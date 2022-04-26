@@ -152,7 +152,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   async function marketSetup() {
     // Check to see if the Digital Goods API is available
     if (await service.isAvailable()) {
-      log('Digital Goods Service is available!');
+      log('Digital Goods Service is available and connected to Play Billing!');
       try {
         // Attach the service to skuList
         skuList.service = service;
