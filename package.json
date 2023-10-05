@@ -87,7 +87,7 @@
     "rollup": "^2.29.0",
     "rollup-plugin-terser": "^7.0.2",
     "snowpack": "^3.0.11",
-    "stylelint": "^13.8.0",
+    "stylelint": "^15.10.3",
     "stylelint-config-standard": "^20.0.0",
     "typescript": "^4.1.3",
     "wait-on": "^5.2.1"
