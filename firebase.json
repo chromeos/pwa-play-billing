@@ -1,7 +1,7 @@
 {
   "hosting": {
     "site": "<FIREBASE_PROJECT_ID>",
-    "public": "src",
+    "public": "build",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
@@ -11,6 +11,7 @@
     ]
   },
   "functions": {
-    "predeploy": ["npm run lint", "npm --prefix \"$RESOURCE_DIR\" run build"]
+    "predeploy": ["npm run lint", "npm --prefix \"$RESOURCE_DIR\" run build"],
+    "runtime": "nodejs20"
   }
 }

@@ -28,9 +28,10 @@ import * as rtdn from './notifications';
 import * as tokensdb from './tokensdb';
 import { topicID } from './config';
 
-import { HttpsError } from 'firebase-functions/lib/providers/https';
+import { HttpsError } from 'firebase-functions/v1/https';
 
 import * as express from 'express';
+import { Request, Response } from 'express';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 
@@ -46,7 +47,7 @@ export interface SkuInfo {
   sku: string;
 }
 
-interface RequestWithUser extends functions.Request {
+interface RequestWithUser extends Request {
   user?: admin.auth.DecodedIdToken;
 }
 
@@ -84,7 +85,7 @@ interface RequestWithUser extends functions.Request {
  * @param {functions.Response} res
  * @param {any} next
  */
-async function appendUser(req: RequestWithUser, res: functions.Response, next: any) {
+async function appendUser(req: RequestWithUser, res: Response, next: any) {
   if (req.headers?.authorization?.startsWith('Bearer ')) {
     const bearerToken = req.headers.authorization.split(' ').pop();
     functions.logger.warn(req.headers?.authorization.toString());
@@ -105,7 +106,7 @@ async function appendUser(req: RequestWithUser, res: functions.Response, next: a
 app.use(appendUser);
 app.use(bodyParser.json());
 
-app.get('/getSkus', async (request: functions.Request, response: functions.Response) => {
+app.get('/getSkus', async (request: Request, response: Response) => {
   functions.logger.info('SKU request came in', { structuredData: true });
   const skuDocs = await db.collection(SKUS_COLLECTION).listDocuments();
   if (skuDocs.length == 0) {
@@ -138,7 +139,7 @@ app.get('/getSkus', async (request: functions.Request, response: functions.Respo
 //     response.json({'status': 'Done'});
 // });
 
-app.post('/getUser', async (request: RequestWithUser, response: functions.Response) => {
+app.post('/getUser', async (request: RequestWithUser, response: Response) => {
   functions.logger.info('User request came in', { structuredData: true });
   usersdb.verifyAuth(request);
   const authenticatedUserRef = await usersdb.authenticateUser(request);
@@ -168,7 +169,7 @@ app.post('/getUser', async (request: RequestWithUser, response: functions.Respon
   response.json({ error: 'error getting user info.' });
 });
 
-app.post('/setTheme', async (request: RequestWithUser, response: functions.Response) => {
+app.post('/setTheme', async (request: RequestWithUser, response: Response) => {
   usersdb.verifyAuth(request);
   const authenticatedUserRef = await usersdb.authenticateUser(request);
 
@@ -201,7 +202,7 @@ app.post('/setTheme', async (request: RequestWithUser, response: functions.Respo
   response.json({ error: 'error changing theme.' });
 });
 
-app.post('/addCoins', async (request: RequestWithUser, response: functions.Response) => {
+app.post('/addCoins', async (request: RequestWithUser, response: Response) => {
   functions.logger.info('Add coins request came in', { structuredData: true });
   usersdb.verifyAuth(request);
   const authenticatedUserRef = await usersdb.authenticateUser(request);
@@ -255,7 +256,7 @@ app.post('/addCoins', async (request: RequestWithUser, response: functions.Respo
   response.json({ status: 'Purchase was already acknowledged' });
 });
 
-app.post('/addPhoto', async (request: RequestWithUser, response: functions.Response) => {
+app.post('/addPhoto', async (request: RequestWithUser, response: Response) => {
   functions.logger.info('Add photo request came in', { structuredData: true });
   usersdb.verifyAuth(request);
   const authenticatedUserRef = await usersdb.authenticateUser(request);
@@ -307,7 +308,7 @@ app.post('/addPhoto', async (request: RequestWithUser, response: functions.Respo
   response.json({ status: 'Purchase was already acknowledged' });
 });
 
-app.post('/removePhoto', async (request: RequestWithUser, response: functions.Response) => {
+app.post('/removePhoto', async (request: RequestWithUser, response: Response) => {
   functions.logger.info('Remove photo request came in', { structuredData: true });
   usersdb.verifyAuth(request);
   const authenticatedUserRef = await usersdb.authenticateUser(request);
@@ -349,7 +350,7 @@ app.post('/removePhoto', async (request: RequestWithUser, response: functions.Re
   response.status(503).json({ error: 'error removing entitlement.' });
 });
 
-app.post('/setHasSub', async (request: RequestWithUser, response: functions.Response) => {
+app.post('/setHasSub', async (request: RequestWithUser, response: Response) => {
   functions.logger.info('Set hasSub request came in', { structuredData: true });
   usersdb.verifyAuth(request);
   const authenticatedUserRef = await usersdb.authenticateUser(request);
@@ -395,7 +396,7 @@ app.post('/setHasSub', async (request: RequestWithUser, response: functions.Resp
   response.json({ status: 'Sub purchase was already acknowledged' });
 });
 
-app.post('/validatePurchase', async (request: functions.Request, response: functions.Response) => {
+app.post('/validatePurchase', async (request: Request, response: Response) => {
   functions.logger.info('Validate purchase request came in', { structuredData: true });
   // Get parameters passed to the request
   const sku: string = request.body?.sku;
@@ -427,31 +428,28 @@ app.post('/validatePurchase', async (request: functions.Request, response: funct
   response.json({ status: true });
 });
 
-app.post(
-  '/validateSubPurchase',
-  async (request: functions.Request, response: functions.Response) => {
-    functions.logger.info('Validate sub purchase request came in', { structuredData: true });
-    // Get parameters passed to the request
-    const sku: string = request.body?.sku;
-    const purchaseToken: string = request.body?.token;
+app.post('/validateSubPurchase', async (request: Request, response: Response) => {
+  functions.logger.info('Validate sub purchase request came in', { structuredData: true });
+  // Get parameters passed to the request
+  const sku: string = request.body?.sku;
+  const purchaseToken: string = request.body?.token;
 
-    // Make sure token isn't already in tokens db
-    if (await tokensdb.exists(purchaseToken)) {
-      console.error('Purchase token already exists');
-      response.json({
-        error: 'Unable to validate subscription purchase because token already exists',
-      });
-      return;
-    }
-    // Verify purchase with Play Developer API
-    const subPurchase = await purchases.fetchSubscriptionPurchase(sku, purchaseToken);
-    if (subPurchase?.isEntitlementActive()) {
-      response.json({ status: true });
-    } else {
-      response.json({ error: 'Subscription is not active and is not valid' });
-    }
-  },
-);
+  // Make sure token isn't already in tokens db
+  if (await tokensdb.exists(purchaseToken)) {
+    console.error('Purchase token already exists');
+    response.json({
+      error: 'Unable to validate subscription purchase because token already exists',
+    });
+    return;
+  }
+  // Verify purchase with Play Developer API
+  const subPurchase = await purchases.fetchSubscriptionPurchase(sku, purchaseToken);
+  if (subPurchase?.isEntitlementActive()) {
+    response.json({ status: true });
+  } else {
+    response.json({ error: 'Subscription is not active and is not valid' });
+  }
+});
 
 const main = express();
 main.use(cors({ origin: true }));
@@ -459,10 +457,10 @@ main.use('/api', app);
 
 exports.main = functions.https.onRequest(main);
 
-export const rtdnListener = functions.pubsub.topic(topicID).onPublish(async (data, context) => {
+export const rtdnListener = functions.pubsub.onMessagePublished(topicID, async (event) => {
   try {
     // Convert the incoming Realtime Developer notification
-    const developerNotification = <rtdn.DeveloperNotification>data.json;
+    const developerNotification = <rtdn.DeveloperNotification>event.data.message.json;
     const sku = developerNotification.subscriptionNotification?.subscriptionId;
     const purchaseToken = developerNotification.subscriptionNotification?.purchaseToken;
     const notification = developerNotification.subscriptionNotification?.notificationType;

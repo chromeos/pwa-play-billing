@@ -17,8 +17,9 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as FirebaseFirestore from '@google-cloud/firestore';
+import { Request } from 'express';
 
-interface RequestWithUser extends functions.Request {
+interface RequestWithUser extends Request {
   user?: admin.auth.DecodedIdToken;
 }
 
