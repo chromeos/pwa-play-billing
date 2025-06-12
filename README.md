@@ -9,7 +9,6 @@
   - [Firebase Hosting](#firebase-hosting)
   - [Firebase Functions](#firebase-functions)
   - [Firebase Cloud Firestore](#firebase-cloud-firestore)
-- [Request an origin trial token](#request-an-origin-trial-token)
 - [First deploy](#first-deploy)
 - [Google Play Console setup](#google-play-console-setup)
   - [General setup](#general-setup)
@@ -32,6 +31,7 @@
   - [Update Digital Asset Links](#update-digital-asset-links)
   - [Re-deploy](#re-deploy)
 - [Google Play Developer API](#google-play-developer-api)
+  - [Enable Google Play Android Developer API](#enable-google-play-android-developer-api)
   - [Link API Project to your Play Console](#link-api-project-to-your-play-console)
   - [Setup a service account](#setup-a-service-account)
   - [Create service account key](#create-service-account-key)
@@ -75,7 +75,7 @@ $ npm start
 
 ![Create Firebase project name. Below, the full project ID is outlined.](images/image2.png 'image_tooltip')
 
-4. The next page is regarding activating Google Analytics for your Firebase project. Turn this option off as this is just a test application and we don’t need analytics activated.
+4. The next page is regarding activating Google Analytics for your Firebase project. This step is optional but if you would like to enable Google Analytics, you will need to [link Google Play to Firebase](https://support.google.com/firebase/answer/6392038?).
 5. Firebase will then set up all the required resources for your project. When it’s done, you will see a “Your new project is ready” message with a continue option. Go ahead and click “Continue”.
 
 ## Firebase Authentication
@@ -167,8 +167,8 @@ This sample uses [Firebase Cloud Firestore](https://firebase.google.com/docs/fir
 
 ![Cloud Firestore in Firebase console.](images/image9.png 'image_tooltip')
 
-2. In the first step, choose “production mode” to keep the data private and click Next. The Admin SDK in the sample functions code handles the communications with the database.
-3. In the second step, choose a Cloud Firestore location. Pick something close to your location where your functions are deployed. Then click Enable.
+2. In the first step, choose “production mode” to keep the data private and keep the database ID as '(default)' (otherwise Functions won't be able to find your database) and click Next. The Admin SDK in the sample functions code handles the communications with the database.
+3. In the second step, choose a Cloud Firestore location. It is recommended to use 'us-central1', since that is where Functions get deployed by default, and moving things around is a little tricky. Then click Enable.
 
 There are three key collections of data as shown below (Note that the document id was omitted from the tables as it is auto-generated). The sample’s backend code automatically populates these tables with Firebase Functions. If you’d like to generate your own SKUs via the Google Play Console, make sure to add them to the SKUs collection in Firestore.
 
@@ -320,17 +320,6 @@ There are three key collections of data as shown below (Note that the document i
 </table>
 
 <br/>
-
-# Request an origin trial token
-
-On [line 23 of index.html](https://github.com/chromeos/pwa-play-billing/blob/main/src/index.html#L23), you will see an option to insert an origin trial token. Visit [this link](https://developer.chrome.com/origintrials/#/view_trial/-5451607348931985407) to request an origin trial token for the Digital Goods API. Once you have your origin trial token, you can go and insert it on line 23 in the content attribute which currently holds the value `$ORIGIN_TRIAL_TOKEN`.
-
-```
- <!-- Origin Trial -->
- <meta http-equiv="origin-trial" content="$ORIGIN_TRIAL_TOKEN" />
-```
-
-To learn more about setting up origin trials, please see [this guide](http://googlechrome.github.io/OriginTrials/developer-guide.html).
 
 # First deploy
 
@@ -558,6 +547,10 @@ Double-check the manifest and asset links at `https://<project.id>.web.app/manif
 
 Like in our sample, it is highly recommended that you verify purchases and tokens in your backend server with the [Google Play Developer API](https://developers.google.com/android-publisher), alongside using the Digital Goods API in your PWA. There are two main configuration steps before you can use the API in your backend code.
 
+## Enable Google Play Android Developer API
+
+Go to the Google Cloud Console and from the menu on left select "APIs & Services" > "Library". Find "Google Play Android Developer API" and enable it.
+
 ## Link API Project to your Play Console
 
 To [link your Google Cloud project in the Play Console](https://developers.google.com/android-publisher/getting_started#using_an_existing_api_project), go to the “API access” section in the left-hand navigation general user menu (not the app menu). This is under “Settings” > “Developer account” > “API access”.
@@ -576,27 +569,15 @@ If you had linked an existing API project with existing service accounts, you ma
 
 If you don’t have a service account, follow these instructions to create a new service account.
 
-1. Click “Create new service account”
-
-![Create a new service account on the API access page.](images/image18.png 'image_tooltip')
-
-2. Follow the instructions and go to the [Google Cloud Platform](https://console.developers.google.com/iam-admin/serviceaccounts/project?project=498462053203) and click “+CREATE SERVICE ACCOUNT”.
-3. Fill in the details and click “Create”.
-4. Then complete step “2. Grant this service account access to project”. Though it is labeled optional, it isn’t in our case. We recommend adding the “Service Accounts” > “Service Account User” role.
+1. Go to the [Google Cloud Platform](https://console.developers.google.com/iam-admin/serviceaccounts/project?project=498462053203) and click “+CREATE SERVICE ACCOUNT”.
+2. Fill in the details and click “Create”.
+3. Then complete step “2. Grant this service account access to project”. Though it is labeled optional, it isn’t in our case. We recommend adding the “Service Accounts” > “Service Account User” role.
 
 ![On Google Cloud Platform, grant "Service Account User" role to service account.](images/image19.png 'image_tooltip')
 
-5. Step 3 is optional as labeled. Click Done to save your service account.
-6. Now go back to the Play Console, and click “Refresh service accounts” to see your new service account listed. Then click “Grant access” to give it permissions.
-
-![In Play Console, click to grant access to service account.](images/image20.png 'image_tooltip')
-![In Play Console, the app permissions tab.](images/image22.png 'image_tooltip')
-
-7. Make sure “Manage orders and subscriptions permission” is checked.
-
-![Enable "Manage orders and subscriptions permission" for service account.](images/image21.png 'image_tooltip')
-
-8. Click “Invite user”.
+4. Step 3 is optional as labeled. Click Done to save your service account.
+5. Now go back to the Play Console, go to "Users and Permissions" and click on "Invite new users". Input the email of your newly created service account and grant permissions to all financial data on both the app and the account.
+6. Click “Invite user”. Note that this takes a good while to propagate, so if you're getting permission errors while trying to make purchases, you need to wait up to 24 hours. Note that the permissions seem to propagate in stages, so it's possible to successfully purchase an item and then get errors while confirming it. If this happens just wait a little more!
 
 ## Create service account key
 
