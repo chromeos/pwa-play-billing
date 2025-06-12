@@ -18,6 +18,7 @@ import * as admin from 'firebase-admin';
 import * as billing from './billing';
 import * as usersdb from './usersdb';
 import * as FirebaseFirestore from '@google-cloud/firestore';
+import { DocumentReference } from 'firebase-admin/firestore';
 
 // import * as { user } from 'firebase-functions/lib/provider/auth';
 
@@ -113,14 +114,14 @@ function addNewToken(
 export async function exists(purchaseToken: string): Promise<boolean> {
   const tokenQuery = tokensRef.where('purchaseToken', '==', purchaseToken);
 
-  const querySnapshot: FirebaseFirestore.QuerySnapshot = await tokenQuery
+  const querySnapshot: FirebaseFirestore.QuerySnapshot | null = await tokenQuery
     .get()
-    .catch(function (error): any {
+    .catch(function (error) {
       console.error(`Error querying tokens : ${error}`);
       return null;
     });
 
-  if (querySnapshot?.size >= 1) {
+  if (querySnapshot && querySnapshot.size >= 1) {
     return true;
   }
 
@@ -137,14 +138,14 @@ export async function invalidateToken(purchaseToken: string): Promise<number> {
   let numInvalidated = 0;
 
   // Fetch token that matches (there should not be duplicate tokens, but handle that case too)
-  const querySnapshot: FirebaseFirestore.QuerySnapshot = await tokenQuery
+  const querySnapshot: FirebaseFirestore.QuerySnapshot | null = await tokenQuery
     .get()
-    .catch(function (error): any {
+    .catch(function (error) {
       console.error(`Error querying tokens : ${error}`);
       return null;
     });
 
-  if (querySnapshot?.size >= 1) {
+  if (querySnapshot && querySnapshot.size >= 1) {
     await Promise.all(
       // Found some tokens that match, invalidate them
       querySnapshot.docs.map(async (docSnapshot) => {
@@ -170,17 +171,19 @@ export async function invalidateToken(purchaseToken: string): Promise<number> {
  *
  * @param {string} purchaseToken A purchase token to search the db for
  */
-export async function getUserRefFromToken(purchaseToken: string): Promise<any> {
+export async function getUserRefFromToken(
+  purchaseToken: string,
+): Promise<DocumentReference | null> {
   const tokenQuery = tokensRef.where('purchaseToken', '==', purchaseToken);
   // Fetch token that matches
-  const querySnapshot: FirebaseFirestore.QuerySnapshot = await tokenQuery
+  const querySnapshot: FirebaseFirestore.QuerySnapshot | null = await tokenQuery
     .get()
-    .catch(function (error): any {
+    .catch(function (error) {
       console.log('Error querying tokens: ', error);
       return null;
     });
   // If there are any matching tokens, just use the first one
-  if (querySnapshot?.size >= 1) {
+  if (querySnapshot && querySnapshot.size >= 1) {
     const token: FirebaseFirestore.QueryDocumentSnapshot = querySnapshot.docs[0];
     // Get the user ID associated with the token, and get the user document reference for that user
     const userDbId = token.data().userDatabaseId;

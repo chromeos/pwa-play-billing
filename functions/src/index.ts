@@ -85,16 +85,20 @@ interface RequestWithUser extends Request {
  * @param {functions.Response} res
  * @param {any} next
  */
-async function appendUser(req: RequestWithUser, res: Response, next: any) {
+async function appendUser(req: RequestWithUser, res: Response, next: express.NextFunction) {
   if (req.headers?.authorization?.startsWith('Bearer ')) {
-    const bearerToken = req.headers.authorization.split(' ').pop();
     functions.logger.warn(req.headers?.authorization.toString());
 
-    try {
-      const user = await admin.auth().verifyIdToken(bearerToken!);
-      req.user = user;
-    } catch (err) {
-      functions.logger.warn('Could not validate user: ', err);
+    const bearerToken = req.headers.authorization.split(' ').pop();
+    if (bearerToken) {
+      try {
+        const user = await admin.auth().verifyIdToken(bearerToken);
+        req.user = user;
+      } catch (err) {
+        functions.logger.warn('Could not validate user: ', err);
+      }
+    } else {
+      functions.logger.warn('Bearer token invalid or empty, cannot determine user');
     }
   } else {
     functions.logger.warn('No bearer token present, cannot determine user');
@@ -123,7 +127,7 @@ app.get('/getSkus', async (request: Request, response: Response) => {
         });
     }
   }
-  const skus: any = [];
+  const skus = [];
   for (const skuDoc of skuDocs) {
     const sku = await skuDoc.get();
     skus.push(sku.data());

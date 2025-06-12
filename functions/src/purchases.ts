@@ -230,7 +230,7 @@ export async function setTheme(
       return { success: true, userCoinValue: newCoinValue };
     })
     .catch(function (error: Error): ChangeResult {
-      console.error('Could not create new coin value in database');
+      console.error('Could not create new coin value in database ', error);
       return { success: false, userCoinValue: userData.numCoins };
     });
 }
@@ -346,7 +346,7 @@ export async function setHasSub(
           console.log(`Added new ${sku} token.`);
         }
       })
-      .catch(function (error: any) {
+      .catch(function (error) {
         console.error(`Failed to add ${sku} token.`, error);
       });
   }
@@ -361,7 +361,7 @@ export async function setHasSub(
           console.log(`Set hasBasicSub to: ${hasSub}`);
           return true;
         })
-        .catch(function (error: any): boolean {
+        .catch(function (error): boolean {
           console.error('Error setHasSub.', error);
           return false;
         });
@@ -374,7 +374,7 @@ export async function setHasSub(
           console.log(`Set hasPremiumSub to: ${hasSub}`);
           return true;
         })
-        .catch(function (error: any): boolean {
+        .catch(function (error): boolean {
           console.error('Error setHasSub.', error);
           return false;
         });
@@ -412,7 +412,7 @@ export async function grantSubBenefits(
           console.log(`Added 2000 coins for ${SKU_BASIC_SUB}`);
           return true;
         })
-        .catch(function (error: any): boolean {
+        .catch(function (error): boolean {
           console.error(`Error adding coins for ${SKU_BASIC_SUB}.`, error);
           return false;
         });
@@ -425,7 +425,7 @@ export async function grantSubBenefits(
           console.log(`Added 5000 coins for ${SKU_PREMIUM_SUB}`);
           return true;
         })
-        .catch(function (error: any): boolean {
+        .catch(function (error): boolean {
           console.error(`Error adding coins for ${SKU_PREMIUM_SUB}.`, error);
           return false;
         });

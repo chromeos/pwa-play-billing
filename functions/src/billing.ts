@@ -150,7 +150,7 @@ export class Purchase {
    * @param {string} productId
    * @return {Purchase}
    */
-  static fromApiResponse(apiResponse: any, purchaseToken: string, productId: string): Purchase {
+  static fromApiResponse(apiResponse: unknown, purchaseToken: string, productId: string): Purchase {
     const purchase = new Purchase();
     // Field names correspond so can leverage auto-mapping
     Object.assign(purchase, apiResponse);
@@ -293,7 +293,7 @@ export class SubscriptionPurchase extends Purchase {
    * @param {string} purchaseToken
    * @return {SubscriptionPurchase}
    */
-  static fromApiResponse(apiResponse: any, purchaseToken: string): SubscriptionPurchase {
+  static fromApiResponse(apiResponse: unknown, purchaseToken: string): SubscriptionPurchase {
     const subPurchase = new SubscriptionPurchase();
     // Field names correspond so can leverage auto-mapping
     Object.assign(subPurchase, apiResponse);
