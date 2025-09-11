@@ -23,12 +23,10 @@ import { addPurchaseToken, addSubscriptionToken } from './tokensdb';
 import * as FirebaseFirestore from '@google-cloud/firestore';
 
 // Initialize the Google API Client from service account credentials
-const jwtClient = new google.auth.JWT(
-  myconfig.serviceAccountEmail,
-  undefined,
-  myconfig.serviceAccountPrivateKey,
-  myconfig.scopes,
-);
+const jwtClient = new google.auth.JWT({
+  keyFile: myconfig.serviceAccountJsonFilePath,
+  scopes: ['https://www.googleapis.com/auth/androidpublisher'],
+});
 
 // Connect to the Google Play Developer API with JWT Client
 const playApi = google.androidpublisher({

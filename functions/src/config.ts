@@ -18,15 +18,11 @@
  * This file is so a user can set their desired constants for their account.
  */
 
-// service account credentials
-export const serviceAccountEmail = '';
-export const serviceAccountPrivateKey = '';
+// service account json file location
+export const serviceAccountJsonFilePath = '<serviceAccountJsonFilePath>';
 
 // app package name
 export const packageName = '<PLAY_PACKAGE_NAME>';
 
 // RTDN pub/sub topic ID
 export const topicID = '<RTDN_TOPIC_ID>';
-
-// needed scopes
-export const scopes: string[] = ['https://www.googleapis.com/auth/androidpublisher'];
