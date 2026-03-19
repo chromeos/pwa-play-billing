@@ -15,7 +15,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@google-cloud/firestore": "^7.0.0",
-    "@google-cloud/storage": "^7.0.0",
+    "@google-cloud/storage": "^7.19.0",
     "@types/cors": "^2.8.9",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
